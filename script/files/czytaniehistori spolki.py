@@ -26,6 +26,13 @@ day_param=350;# - year
 day_param=1;
 #day_param=1;
 
+#parameters for sql connection
+
+host_param = "remotemysql.com"
+user_param = "zr00HYpK6O"
+passwd_param = "SOdKgWqLJr"
+database_param = "zr00HYpK6O"
+
 #mysql connection set up
 # mydb = mysql.connector.connect(
 # host="localhost",
@@ -34,10 +41,10 @@ day_param=1;
 # database="apkadb"
 # )
 mydb = mysql.connector.connect(
-host=" remotemysql.com",
-user="zr00HYpK6O",
-passwd="SOdKgWqLJr",
-database="zr00HYpK6O"
+host=host_param,
+user=user_param,
+passwd=passwd_param,
+database=database_param
 )
 mycursor = mydb.cursor()
 
@@ -47,7 +54,7 @@ last_oid=-1;
 def select_last_from_mysql_db(table_name):
 
     #sql = "select " + "max(" +table_name+"_oid)"+","+"max(" +table_name+"_id)" + " from " + "apkadb."+table_name
-    sql = "select " + "max(" + table_name + "_oid)" + "," + "max(" + table_name + "_id)" + " from " + "zr00HYpK6O." + table_name
+    sql = "select " + "max(" + table_name + "_oid)" + "," + "max(" + table_name + "_id)" + " from " + database_param + "." + table_name
     #print(sql)
     mycursor.execute(sql)
     myresult = mycursor.fetchall()
@@ -447,7 +454,7 @@ def check_if_record_already_exist(output):
 
     table_name ="raport"
     #sql = "select *" + " from " + "apkadb."+table_name + " where date" +"='" +str(output[0]) +"' and company_name"+ "='" + str(output[1]+"'")
-    sql = "select *" + " from " + "zr00HYpK6O." + table_name + " where date" + "='" + str(output[0]) + "' and company_name" + "='" + str(output[1] + "'")
+    sql = "select *" + " from " + database_param + "." + table_name + " where date" + "='" + str(output[0]) + "' and company_name" + "='" + str(output[1] + "'")
     #print (sql)
     mycursor.execute(sql)
     myresult = mycursor.fetchall()
