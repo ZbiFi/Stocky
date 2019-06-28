@@ -23,22 +23,31 @@ cheap_list = []
 normal_list = []
 expensive_list = []
 day_param=350;# - year
+day_param=1;
 #day_param=1;
 
 #mysql connection set up
+# mydb = mysql.connector.connect(
+# host="localhost",
+# user="root",
+# passwd="that5whorule",
+# database="apkadb"
+# )
 mydb = mysql.connector.connect(
-host="localhost",
-user="root",
-passwd="that5whorule",
-database="apkadb"
+host=" remotemysql.com",
+user="zr00HYpK6O",
+passwd="SOdKgWqLJr",
+database="zr00HYpK6O"
 )
+mycursor = mydb.cursor()
+
 last_id=-1;
 last_oid=-1;
-mycursor = mydb.cursor()
     
 def select_last_from_mysql_db(table_name):
 
-    sql = "select " + "max(" +table_name+"_oid)"+","+"max(" +table_name+"_id)" + " from " + "apkadb."+table_name
+    #sql = "select " + "max(" +table_name+"_oid)"+","+"max(" +table_name+"_id)" + " from " + "apkadb."+table_name
+    sql = "select " + "max(" + table_name + "_oid)" + "," + "max(" + table_name + "_id)" + " from " + "zr00HYpK6O." + table_name
     #print(sql)
     mycursor.execute(sql)
     myresult = mycursor.fetchall()
@@ -60,11 +69,11 @@ def read_raports():
     normal_list.clear()
     expensive_list.clear()
     var_for_k_param = 1
-    companies_list.clear()
+    #companies_list.clear()
     #companies_list.append(["skarbiec"])
     #companies_list.append(["ideabank"])
     #companies_list.append(["skarbiec"])
-    companies_list.append(["domdev"])
+    #companies_list.append(["domdev"])
     check_if_new_raport_exist()
     for k in range(day_param):
         print(k)
@@ -437,7 +446,8 @@ def insert_into_mysql_db(last_oid,last_id,output):
 def check_if_record_already_exist(output):
 
     table_name ="raport"
-    sql = "select *" + " from " + "apkadb."+table_name + " where date" +"='" +str(output[0]) +"' and company_name"+ "='" + str(output[1]+"'")
+    #sql = "select *" + " from " + "apkadb."+table_name + " where date" +"='" +str(output[0]) +"' and company_name"+ "='" + str(output[1]+"'")
+    sql = "select *" + " from " + "zr00HYpK6O." + table_name + " where date" + "='" + str(output[0]) + "' and company_name" + "='" + str(output[1] + "'")
     #print (sql)
     mycursor.execute(sql)
     myresult = mycursor.fetchall()
@@ -450,7 +460,8 @@ def check_if_record_already_exist(output):
 
 def import_names_from_file():
 
-    filename = 'C:\\selenium\\companies.txt'
+    #filename = 'C:\\selenium\\companies.txt'
+    filename = 'companies.txt'
     with open(filename,'r') as f:
         reader =csv.reader(f)
         for row in (list(reader)):
