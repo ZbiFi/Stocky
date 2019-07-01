@@ -46,15 +46,30 @@ sql1 = "CREATE TABLE IF NOT EXISTS raport ( raport_oid int(11), raport_id int(11
 sql5 = "drop table if exists raport"
 sql6 = "INSERT INTO raport (raport_oid, raport_id, date, company_name, current_value, current_status,previous_status,Streak,special_value,Perct_special_value,bottom_price_channel, upper_price_channel, max_value) VALUES (1,2,3,4,5,6,7,8,9,10,11,12,13)"
 sql4 = "select * from raport"
+sql7 = "CREATE TABLE IF NOT EXISTS users (users_oid int(11), users_id int(11), user_name varchar (45))"
+sql75 = "drop table if exists users"
+sql8 = "select * from users"
+sql9 = "CREATE TABLE IF NOT EXISTS transactions (transactions_oid int(11), transactions_id int(11), users_oid varchar (45), company_name varchar(45), buy_price float, quantity int(11), date int(11), db_status int (11))"
+sql95 = "drop table if exists transactions"
+sql10 = "select * from transactions"
 
 mycursor = mydb.cursor()
 
-mycursor.execute(sql5)
-mycursor.execute(sql1)
+#mycursor.execute(sql5)
+#mycursor.execute(sql1)
 #mycursor.execute(sql6)
-mycursor.execute(sql4)
+#mycursor.execute(sql4)
+#mycursor.execute(sql95)
+
+#mycursor.execute(sql7)
+#mycursor.execute(sql8)
+
+mycursor.execute(sql9)
+#mycursor.execute(sql95)
+#mycursor.execute(sql10)
 
 myresult = mycursor.fetchall()
+
 print (myresult)
 
 
