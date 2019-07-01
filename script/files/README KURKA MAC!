@@ -1,0 +1,50 @@
+!!!!!!!!!!Dokumentacja i how to do by bylo dobrze i by nikt nie krzyczal ze nie dziala.!!!!!!!!!!!!
+
+Kolejnosc odpalania WAZNYCH skryptow
+
+1) WOLUMEN AKCJI - zaciaga najnowsze dane z gieldy (BOS bank) i tworzy podfoldery to danych - odpalany raz na dzien, i ewentualnie po 18 kazdego dnia (bo wtedy schodza wyniki z dzisiaj)
+
+2) CZYTANIE HISTORII SPOLKI - tworzy dane ktore sa eksportowane to tablicy raport (SQL na serwerze) WAZNE day_param dla pierwszego uruchomienia (gdy baza jest pusta) musi wynosic 350 (co daje okolo roku danych)
+
+potem mozna ten parametr zmniejszyc. Jesli NIKT inny nie odpala skryptu to polecam zapuscic z 350, chyba ze wiadomo ze byl odpalany niedawno wtedy mniej. 1 = 1 dzien, (tylko obecny), 2 - dzis i wczoraj etc.
+
+BEZ TEGO SKRYPTU NIE BEDZIE DANYCH DO DALSZEJ ANALIZY.
+
+3) USER_INTERFACE - tworzy uzytkownikow i przypisuje im tranzakcje. Mozecie to robic recznie albo bawic sie sqlem i pakowac do tablicy. TYLKO PILNOWAC KOLUMN I TEGO CO TAM WKLADACIE, ale to zaraz.
+
+
+
+
+
+OPISY TABLIC
+
+RAPORT
+
+kolumny:
+    oid i id - to numery porzadkowe, wazne by sie nie powtarzaly. Ogolnie jak chcecie kasowac nie to nie usuwajcie danych z tablicy. Ja to bede robil.
+    date - WAZNE TO SAMO JETS W TRANSACTIONS. DATA jest zapisywana jako format YYYYMMDD bez / . czy innych g... po prostu np 19991224.
+    company_name - nazwa spolki - z pliku companies.txt NIE PAKOWAC NICZEGO CZEGO NIE MA W PLIKU TXT
+    current_value - obecna(z poprzedniego dnia) cena zakonczenia akcji
+    current_status - status wzgledem kanalu cenowego (in w kanale, upper ponad kanalem, low ponizej) - czyt, jako tani, sredni i drogi
+    previous_status - to samo co powyzej, ale poprzedni jaki byl w historii. Np BENEFIT byl w kanale, ale jest teraz low (tani)
+    streak - liczba dni przez jaki spolka jest w kanale - mowi czy cos sie zmienia, czy jak np deutche bank tylko spada i spada
+    special_value - TO WAZNE w zaleznosci od tego w jakim statusie jest spolka, to cena minimalna (przez ostatni rok)/ maksymalna albo jak jest w in to srednia kanalu cenowego
+    pertc_special_value - TO samo co powyzej ale wyrazone w % wzgledem aktualnej ceny. current cena/special value
+    bottom price channel - obecna dolna granica kanalu cenowego
+    upper price channel - obecna gorna granica kanalu cenowego
+    max_value - informacja o makxymalnym szczycie przez ostatni rok.
+
+
+
+USERS - banalne baza userow i odpowiadajacym im id'kom. W bazie w tablicy transactions uzywa sie id'kow a nie nazw. PAMIETAC O TYM.
+
+TRANSACTIONS - trzymane dane poszczegolnych uzytkownikow.
+
+kolumny:
+    oid i id - to numery porzadkowe, wazne by sie nie powtarzaly. Ogolnie jak chcecie kasowac nie to nie usuwajcie danych z tablicy. Ja to bede robil.
+    user_oid - odpowiadajacy tranzakcji user - patrzcie tablica userow jesli chcecie znac imie usera
+    company_name - nazwa spolki - z pliku companies.txt NIE PAKOWAC NICZEGO CZEGO NIE MA W PLIKU TXT
+    buy_price - cena kupna format z . np 15.59
+    quantity - ilosc - obvious
+    date - WAZNE TO SAMO JETS W RAPORCIE. DATA jest zapisywana jako format YYYYMMDD bez / . czy innych g... po prostu np 19991224.
+    db_status - status obiektu. Kiedys to tez bedzie do userow ale na razie nie ahahahahahaha. -1 oznacza usuniety +1 oznacza aktywny
