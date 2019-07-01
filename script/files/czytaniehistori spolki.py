@@ -7,7 +7,9 @@ from pathlib import Path
 import pandas as pd
 import mysql.connector
 
-filename_url_part1 = 'C:/selenium/Benefit.mst'
+selenium_url = 'C:/selenium/'
+filename_url_part1 = selenium_url + 'Benefit.mst'
+
 today = dt.datetime.now().date()
 todayStr = str(today)
 todayStr2 = todayStr.replace("-","")
@@ -366,7 +368,10 @@ def check_if_new_raport_exist ():
 
     today = dt.datetime.now().date()
 
-    filename = 'C:\\selenium\\PC\\'+'raporty'+str(today)+'.txt' #for new raports
+    if not os.path.exists(selenium_url+ '/PC'):
+        os.makedirs(selenium_url + '/PC')
+    filename = selenium_url + 'PC/' + 'raporty'+str(today)+'.txt'
+    #filename = 'C:\\selenium\\PC\\'+'raporty'+str(today)+'.txt' #for new raports
 
     if os.path.exists(filename):
         os.remove(filename)
@@ -400,7 +405,8 @@ def export_to_file(cheap_list,normal_list,expensive_list):
     if (date!=0):
 
         #filename = 'C:\\selenium\\PC\\'+'raporty'+'.txt' #for one big raports
-        filename = 'C:\\selenium\\PC\\'+'raporty'+str(today)+'.txt' #for new raports
+        filename = selenium_url + 'PC/' +'raporty'+str(today)+'.txt' #for new raports
+        #filename = 'C:\\selenium\\PC\\'+'raporty'+str(today)+'.txt' #for new raports
         
         with open(filename,'a', newline='') as f:
             writer = csv.writer(f, delimiter=' ')
@@ -480,7 +486,8 @@ def import_data_from_file(company_name):
     timelapse=20000 # 2 lata dla analizy na 1 rok
     #super_data = []
     #filename = 'C:\\selenium\\'+company_name+'.csv' # stooq data
-    filename = 'C:\\selenium\\ALL\\'+company_name+'.mst' # BOS data
+    filename = selenium_url + 'ALL/'+company_name+'.mst' # BOS data
+    #filename = 'C:\\selenium\\ALL\\'+company_name+'.mst' # BOS data
     with open(filename,'r') as f:
         reader =csv.reader(f)
         super_data

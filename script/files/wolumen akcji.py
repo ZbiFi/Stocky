@@ -56,6 +56,7 @@ interesting_companies = []
 under_price_channel = []
 in_price_channel = []
 over_price_channel = []
+seleniumfolder = 'C:/selenium/'
 
 def start():
     while True:
@@ -302,8 +303,8 @@ def menu_index_choice(index_choice):
 
 def manage_download_all():
 
-    filename = 'C:/selenium/' + "ALL" + '.zip'
-    filename_2 = 'C:/selenium/' + "TRYPLN" + '.csv'
+    filename = seleniumfolder + "ALL" + '.zip'
+    filename_2 = seleniumfolder + "TRYPLN" + '.csv'
     today = dt.datetime.now().date()
     if os.path.exists(filename) and os.path.exists(filename_2):
         filetime= dt.datetime.fromtimestamp(os.path.getmtime(filename))
@@ -319,15 +320,18 @@ def manage_download_all():
             #    zip_ref.close()
             return;
 
-    fullfilename = os.path.join('C:/selenium/', "ALL" + '.zip')
-    fullfilename_2 = os.path.join('C:/selenium/', "TRYPLN" + '.csv')
+    fullfilename = os.path.join(seleniumfolder, "ALL" + '.zip')
+    fullfilename_2 = os.path.join(seleniumfolder, "TRYPLN" + '.csv')
+    if not os.path.exists(seleniumfolder):
+        os.makedirs(seleniumfolder)
+        os.makedirs(seleniumfolder + "ALL")
     urllib.request.urlretrieve('http://bossa.pl/pub/metastock/mstock/mstall.zip', fullfilename)
     print("downloaded ALL")
     urllib.request.urlretrieve('https://stooq.pl/q/d/l/?s=trypln&i=d', fullfilename_2)
     print("downloaded TRYPLN")
     if os.path.exists(filename) :
-        zip_ref = zipfile.ZipFile('C:/selenium/' + "ALL" + '.zip', 'r')
-        zip_ref.extractall('C:/selenium/' + "ALL")
+        zip_ref = zipfile.ZipFile(seleniumfolder + "ALL" + '.zip', 'r')
+        zip_ref.extractall(seleniumfolder + "ALL")
         zip_ref.close()
 
 
@@ -376,7 +380,7 @@ def generating_raports(company_symbol,block_size,block_step,time_lapse,auto):
 def generate_raport_to_file(company_symbol,block_size,block_step,time_lapse,list_of_data_for_log):
 
     previous_id = 1
-    filename = 'C:/selenium/raport.csv'
+    filename = seleniumfolder+'raport.csv'
     if os.path.exists(filename):
         previous_id=int(read_previous_raport())
         previous_id+=1
@@ -384,7 +388,7 @@ def generate_raport_to_file(company_symbol,block_size,block_step,time_lapse,list
     
 def append_new_raport(previous_id,company_symbol,block_size,block_step,time_lapse,list_of_data_for_log):
 
-    filename = 'C:/selenium/raport.csv'
+    filename = seleniumfolder+'raport.csv'
     #print ('dupa')
     
     with open(filename,'a', newline='') as f:
@@ -448,7 +452,7 @@ def generate_output_raport(company_symbol,block_size,block_step,time_lapse,auto)
 
     generate_raport_to_file(company_symbol,block_size,block_step,time_lapse,list_of_data_for_log)
     
-    filename = 'C:/selenium/SuperRaport.txt'
+    filename = seleniumfolder + 'SuperRaport.txt'
     with open(filename,'w', newline='') as f:
         writer = csv.writer(f, delimiter=' ')
         writer.writerow ("********************")
@@ -476,7 +480,7 @@ def generate_output_raport(company_symbol,block_size,block_step,time_lapse,auto)
         writer.writerow ("********************")
 
     today = dt.datetime.now().date()
-    filename = 'C:/selenium/PriceChannelReport' + str(today) + '.txt'
+    filename = seleniumfolder +'PriceChannelReport' + str(today) + '.txt'
     #filename = 'C:/selenium/PriceChannelReport' + 'Asss' + '.txt'
     with open(filename,'w', newline='') as f:
         writer = csv.writer(f, delimiter=',')
@@ -495,7 +499,7 @@ def generate_output_raport(company_symbol,block_size,block_step,time_lapse,auto)
 
 def negerate_interesting_companies_to_file():
 
-    filename = 'C:/selenium/interesting_raport.txt'
+    filename = seleniumfolder + 'interesting_raport.txt'
     if os.path.exists(filename):
         os.remove(filename)
         
@@ -508,7 +512,7 @@ def negerate_interesting_companies_to_file():
 
 def read_previous_raport ():
 
-    filename = 'C:/selenium/raport.csv'
+    filename = seleniumfolder + 'raport.csv'
     previous_id= 0
     temp_list = []
     with open(filename,'r') as f:
@@ -561,7 +565,8 @@ def import_data_from_file(time_lapse,company_symbol,company_name):
     #super_data = []
     time_lapse = int (time_lapse)
     #filename = 'C:\\selenium\\'+company_name+'.csv' # stooq data
-    filename = 'C:\\selenium\\ALL\\'+company_name+'.mst' # BOS data
+    #filename = 'C:\\selenium\\ALL\\'+company_name+'.mst' # BOS data
+    filename = seleniumfolder + 'ALL/' + company_name+'.mst'
     with open(filename,'r') as f:
         reader =csv.reader(f)
         super_data
@@ -688,7 +693,7 @@ def analyze_data (company_symbol,block_size,block_step,string,time_lapse):
             over_price_channel.append([company_name_ref,upper,data_list[0]])
         price_channel.append([company_name_ref,time_lapse_ref,"END PRICE - PRICE CHANNEL:","<",lower,";",upper,">","LAST END PRICE:",data_list[0]])
         #price_channel += (company_name_ref,time_lapse_ref,"END PRICE - PRICE CHANNEL:",lower,upper,"LAST END PRICE:",data_list[0])
-        filename = 'C:/selenium/Raport_Spółki_' + company_name_ref + '.txt'
+        filename = seleniumfolder+'Raport_Spółki_' + company_name_ref + '.txt'
         #if os.path.exists(filename):
         #    with open(filename,'r') as f:
         #        reader =csv.reader(f)
