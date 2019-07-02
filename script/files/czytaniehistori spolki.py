@@ -27,6 +27,15 @@ expensive_list = []
 # day_param = 350 # - year
 day_param = 1
 
+while True:
+
+    print("Please provide number of days from now for DB import: (1-350) default: 1 ")
+    choice = input()
+
+    if choice == "":
+        break
+    if 1 <= int(choice) <= 350:
+        day_param = int(choice)
 
 # parameters for sql connection
 
@@ -44,10 +53,10 @@ database_param = "zr00HYpK6O"
 # )
 
 mydb = mysql.connector.connect(
-host = host_param,
-user = user_param,
-passwd = passwd_param,
-database = database_param
+ host=host_param,
+ user=user_param,
+ passwd=passwd_param,
+ database=database_param
 )
 mycursor = mydb.cursor()
 
@@ -364,6 +373,7 @@ def export_to_file(cheap_list,normal_list,expensive_list):
         print("Something wrong with date", date)
 
 def main ():
+
 
     global last_oid, last_id, max_value
     last_oid, last_id = select_last_from_mysql_db("raport")
