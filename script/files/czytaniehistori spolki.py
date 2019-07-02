@@ -1,9 +1,6 @@
 import time
 import datetime as dt
 import csv
-import os.path
-from datetime import datetime,timedelta
-from pathlib import Path
 import pandas as pd
 import mysql.connector
 
@@ -21,9 +18,6 @@ lets_say_current_list = []
 date_list = []
 curr_2year = []
 companies_list = []
-cheap_list = []
-normal_list = []
-expensive_list = []
 # day_param = 350 # - year
 day_param = 1
 
@@ -34,9 +28,12 @@ while True:
 
     if choice == "":
         break
-    if 1 <= int(choice) <= 350:
-        day_param = int(choice)
+    else:
+        choice = int(choice)
 
+    if 1 <= choice <= 350:
+        day_param = choice
+        break
 # parameters for sql connection
 
 host_param = "remotemysql.com"
@@ -62,13 +59,14 @@ mycursor = mydb.cursor()
 
 last_id = -1
 last_oid = -1
-    
+
+
 def select_last_from_mysql_db(table_name):
 
     sql = "select " + "max(" + table_name + "_oid)" + "," + "max(" + table_name + "_id)" + " from " + database_param + "." + table_name
     mycursor.execute(sql)
     myresult = mycursor.fetchall()
-    temp1,temp2=myresult[0]
+    temp1, temp2 = myresult[0]
     if str(temp1) == "None":
         return -1, 0
     else:
@@ -78,17 +76,16 @@ def select_last_from_mysql_db(table_name):
 def read_raports():
     
     import_names_from_file()
-    cheap_list.clear()
-    normal_list.clear()
-    expensive_list.clear()
-    #companies_list.clear()
-    #companies_list.append(["skarbiec"])
-    #companies_list.append(["ideabank"])
-    #companies_list.append(["skarbiec"])
-    #companies_list.append(["domdev"])
-    check_if_new_raport_exist()
+    time_table = []
+    # companies_list.clear()
+    # companies_list.append(["skarbiec"])
+    # companies_list.append(["ideabank"])
+    # companies_list.append(["skarbiec"])
+    # companies_list.append(["domdev"])
+
     for k in range(day_param):
-        print(k)
+        print(str(k) + " from " + str(day_param))
+        time_start = time.time()
         for i in range(len(companies_list)):
 
             super_data.clear()
@@ -99,29 +96,16 @@ def read_raports():
             date_list.clear()
 
             import_data_from_file(str(companies_list[i][0]))
-            analyze_data(companies_list[i][0],k)
+            analyze_data(companies_list[i][0], k)
 
-        print("Under price channel:")
-        for i in range(len(cheap_list)):        
-            print(cheap_list[i])
+        time_end = time.time()
 
-        print("")   
-        print("In price channel:")
-        for i in range(len(normal_list)):
-            print(normal_list[i])
+        time_table.append(time_end - time_start)
 
-        print("")    
-        print("Over price channel:")
-        for i in range(len(expensive_list)):
-            print(expensive_list[i])
-        print("")
+    print(time_table)
 
-        export_to_file(cheap_list,normal_list,expensive_list)
-        cheap_list.clear()
-        normal_list.clear()
-        expensive_list.clear()
 
-def analyze_data (company_name,day_param):
+def analyze_data(company_name, day_param_iterator):
 
     timelapse = 10000
     global max_value
@@ -129,17 +113,12 @@ def analyze_data (company_name,day_param):
     current_status = ""
     last_status = ""
     previous_status = ""
-    change_bigger_status = 0
-    max_value=[]
+    max_value = []
     max_value.clear()
     statuses = []
     output = []
-    buffor_day_range=5 # zakres bufforu z pocatku roku uniemozliwiajacy sell
+    buffor_day_range = 5  # zakres bufforu z pocatku roku uniemozliwiajacy sell
     output.clear()
-    temp_max_value = 0
-    temp = ""
-    lowest = 0
-    highest = 0
     low_max_text = ""
     low_max_value = 0
     special_text = ""
@@ -147,44 +126,47 @@ def analyze_data (company_name,day_param):
     temp_value_for_i = 0
     max_value.clear()
     progression = 0
-    change_status = 1
-    for i in range (len(super_data)):
+    for i in range(len(super_data)):
         if(int(todayStr2)-timelapse) > int(super_data[i][1]):
             days_in_year = i
             break
 
-    for j in range (days_in_year):
+    for j in range(days_in_year):
         temp_var = days_in_year+j
-        for i in range (j,temp_var):
+        for i in range(j, temp_var):
             if i == len(super_data)-1:
                 break
             data_list.append(super_data[i][5])
 
         temp_max_value = 0
-        df=pd.DataFrame(data_list)
+        df = pd.DataFrame(data_list)
         lower_list.append(float(df.quantile(0.33)))
         upper_list.append(float(df.quantile(0.66)))
-        date_list.append(int(super_data[j][1])) #!!!!!!wrzucic do petli for i->powinno dzialac
+        date_list.append(int(super_data[j][1]))  # !!!!!!wrzucic do petli for i->powinno dzialac
         lets_say_current_list.append(data_list[0])
         for k in range(buffor_day_range):
             if float(data_list[len(data_list)-1-k]) > float(temp_max_value):
-                temp_max_value=float(data_list[len(data_list)-1-k])
+                temp_max_value = float(data_list[len(data_list)-1-k])
         max_value.append(temp_max_value)
         data_list.clear()
     highest = max(lets_say_current_list)
     lowest = min(lets_say_current_list)
 
-    if 1 == 1:
+    if 1 == 1:  # not check_if_record_already_exist_2(date_list[day_param], company_name):
 
-        for i in reversed(range(day_param,len(lower_list))):
+        # print ("Not exists")
+
+        for i in reversed(range(day_param_iterator, len(lower_list))):
+
+            # print(str(check_if_record_already_exist_2(date_list[day_param], company_name)) + " " + str(date_list[day_param]) + " " + str(company_name))
 
             if float(lets_say_current_list[i]) < float(lower_list[i]):
 
-                special_text="Perct to bottom price channel"
-                special_value="{0:.2f}".format(100-(float(lets_say_current_list[i])/float(lower_list[i])*100))
-                low_max_text="Min Value"
-                low_max_value=lowest
-                current_status="low"
+                special_text = "Perct to bottom price channel"
+                special_value = "{0:.2f}".format(100-(float(lets_say_current_list[i])/float(lower_list[i])*100))
+                low_max_text = "Min Value"
+                low_max_value = lowest
+                current_status = "low"
                 statuses.append("low")            
                 if last_status != current_status:
                     progression = 1
@@ -196,7 +178,7 @@ def analyze_data (company_name,day_param):
  
             elif float(lets_say_current_list[i]) >= float(lower_list[i]) and (float(lets_say_current_list[i]) <= float(upper_list[i])):
 
-                special_text="Perct from avg channel price"
+                special_text = "Perct from avg channel price"
                 avg = ((float(upper_list[i])+float(lower_list[i]))/2)
                 special_value = "{0:.2f}".format(float(lets_say_current_list[i])/avg)
                 low_max_text = "Average channel price:"
@@ -230,18 +212,20 @@ def analyze_data (company_name,day_param):
         
             temp_value_for_i = i
 
-        if int(day_param) < len(lower_list):
-                            
-            output =[date_list[temp_value_for_i], company_name, "Current Value: ", lets_say_current_list[temp_value_for_i], "Current status", current_status,"Previous status",previous_status,"Streak",progression,low_max_text,low_max_value,special_text,special_value,"Lower Price Channel",lower_list[i],"Upper Price Channel",upper_list[i],max_value[day_param]]
+        # checking for max range of dates in comp history ex if company is 30 days on market,but users checks for 45days
+        if int(day_param_iterator) < len(lower_list):
+
+            output = [date_list[temp_value_for_i], company_name, "Current Value: ", lets_say_current_list[temp_value_for_i], "Current status", current_status, "Previous status", previous_status, "Streak", progression, low_max_text, low_max_value, special_text, special_value, "Lower Price Channel", lower_list[temp_value_for_i], "Upper Price Channel", upper_list[temp_value_for_i], max_value[day_param_iterator]]
             analyze_price_channel(output)
 
             if check_if_record_already_exist(output):
                 print("RECORD ALREADY EXISTS:" + str(output))
             else:            
-                global last_oid,last_id
-                insert_into_mysql_db(last_oid,last_id,output)
-                last_oid,last_id = select_last_from_mysql_db("raport")
-            
+                global last_oid, last_id
+                insert_into_mysql_db(last_oid, last_id, output)
+                last_oid, last_id = select_last_from_mysql_db("raport")
+
+
 def analyze_price_channel(output):
 
     text = ""
@@ -270,7 +254,6 @@ def analyze_price_channel(output):
         # print(output)
         output.append(text)
         # print(output)
-        cheap_list.append([output])
     if output[5] == "in":
         if output[7] == "low":
             if float(output[13]) < float(1):
@@ -292,7 +275,6 @@ def analyze_price_channel(output):
                 # print("Starting to decline - last moment for selling")
                 text = "Late Selling"
         output.append(text)
-        normal_list.append([output])
     if (output[5] == "upper") and (float(output[3]) > float(output[18])):
         if float(output[3]) / float(output[11]) > float(0.9):
             # Cena buduje szczyt - jestes w topie lub w 10% odleglosci od niego
@@ -308,97 +290,39 @@ def analyze_price_channel(output):
                 # print("Expensive but far from heaven - think of selling")
                 text = "SELL2"
         output.append(text)
-        expensive_list.append([output])
     elif (output[5] == "upper") and (float(output[3]) <= float(output[18])):
         # Cena odbija ale jest ryzyko ze sell w stosunku do buya bedzie na -
         # text = "Starting to rise - risky Buy"
         text = "Selling not adviced - possible High Buying Price"
         output.append(text)
-        expensive_list.append([output])
     # print("")
-    return 
-def check_if_new_raport_exist ():
+    return
 
-    current_today = dt.datetime.now().date()
 
-    if not os.path.exists(selenium_url+ '/PC'):
-        os.makedirs(selenium_url + '/PC')
-    filename = selenium_url + 'PC/' + 'raporty'+str(current_today)+'.txt'
-
-    if os.path.exists(filename):
-        os.remove(filename)
-
-def export_to_file(cheap_list,normal_list,expensive_list):
-
-    today = dt.datetime.now().date()
-    date=0
-    date1=0
-    date2=0
-    date3=0
-
-    if len(cheap_list) != 0:
-        date1 = cheap_list[0][0][0]
-    if len(normal_list) != 0:
-        date2 = normal_list[0][0][0]
-    if len(expensive_list) != 0:
-        date3 = expensive_list[0][0][0]
-        
-    if date1 != 0:
-        date = date1
-    elif date2 != 0:
-        date = date2
-    elif date3 != 0:
-        date = date3
-    if date != 0:
-
-        # filename = 'C:\\selenium\\PC\\'+'raporty'+'.txt' #for one big raports
-        filename = selenium_url + 'PC/' + 'raporty' + str(today) + '.txt' # for new raports
-        # filename = 'C:\\selenium\\PC\\'+'raporty'+str(today)+'.txt' #for new raports
-        
-        with open(filename,'a', newline='') as f:
-            writer = csv.writer(f, delimiter=' ')
-            writer.writerow("Below Price Channel:")
-            for i in range(len(cheap_list)):
-                writer.writerow(cheap_list[i])
-            writer.writerow("")
-            writer.writerow("In Price Channel:")
-            for i in range(len(normal_list)):
-                writer.writerow(normal_list[i])
-            writer.writerow("")
-            writer.writerow("Above Price Channel:")
-            for i in range(len(expensive_list)):
-                writer.writerow(expensive_list[i])
-            writer.writerow("")
-    else:
-        print("Something wrong with date", date)
-
-def main ():
-
+def main():
 
     global last_oid, last_id, max_value
     last_oid, last_id = select_last_from_mysql_db("raport")
     max_value = []
     read_raports()
 
-def insert_into_mysql_db(last_oid,last_id,output):
 
-    database = "raport"
-    temp_oid = last_oid+1
-    temp_id = last_id+1
+def insert_into_mysql_db(last_oid_param, last_id_param, output):
+
+    temp_oid = last_oid_param+1
+    temp_id = last_id_param+1
     sql = "INSERT INTO raport (raport_oid, raport_id, date, company_name, current_value, current_status,previous_status,Streak,special_value,Perct_special_value,bottom_price_channel, upper_price_channel, max_value) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
     # val = (temp_oid,temp_id,"20190205","Hydrotor","20","low","in","5","15","20","50","100")
 
     val = (temp_oid, temp_id, output[0], output[1], output[3], output[5], output[7], output[9], output[11], output[13], output[15], output[17], output[18])
     mycursor.execute(sql, val)
     mydb.commit()
-    
-    last_oid,last_id = select_last_from_mysql_db("raport")
 
 
 def check_if_record_already_exist(output):
 
     table_name = "raport"
-    #sql = "select *" + " from " + "apkadb."+table_name + " where date" +"='" +str(output[0]) +"' and company_name"+ "='" + str(output[1]+"'")
+    # sql = "select *" + " from " + "apkadb."+table_name + " where date" +"='" +str(output[0]) +"' and company_name"+ "='" + str(output[1]+"'")
     sql = "select *" + " from " + database_param + "." + table_name + " where date" + "='" + str(output[0]) + "' and company_name" + "='" + str(output[1] + "'")
     mycursor.execute(sql)
     myresult = mycursor.fetchall()
@@ -408,29 +332,41 @@ def check_if_record_already_exist(output):
     else:
         return False
 
+
+def check_if_record_already_exist_2(date, company_name):
+
+    table_name = "raport"
+    sql = "select *" + " from " + database_param + "." + table_name + " where date" + "='" + str(date) + "' and company_name" + "='" + str(company_name) + "'"
+    mycursor.execute(sql)
+    myresult = mycursor.fetchall()
+    if len(myresult) > 0:
+        return True
+    else:
+        return False
+
+
 def import_names_from_file():
 
-    #filename = 'C:\\selenium\\companies.txt'
+    # filename = 'C:\\selenium\\companies.txt'
     filename = 'companies.txt'
     with open(filename, 'r') as f:
         reader = csv.reader(f)
         for row in (list(reader)):
             companies_list.append(row)
 
+
 def import_data_from_file(company_name):
     
     i = 0
-    timelapse = 20000 # 2 lata dla analizy na 1 rok
+    timelapse = 20000  # 2 lata dla analizy na 1 rok
     # filename = 'C:\\selenium\\'+company_name+'.csv' # stooq data
-    filename = selenium_url + 'ALL/'+company_name+'.mst' # BOS data
+    filename = selenium_url + 'ALL/'+company_name+'.mst'  # BOS data
     # filename = 'C:\\selenium\\ALL\\'+company_name+'.mst' # BOS data
     with open(filename, 'r') as f:
         reader = csv.reader(f)
-        super_data
         super_data.clear()
         f.readline()
-        temporary_number = 0
-        j = 0
+
         for row in reversed(list(reader)):
             if (int(todayStr2) - timelapse) <= int(row[1]):
                 super_data.append(row)
@@ -441,5 +377,6 @@ def import_data_from_file(company_name):
         for j in range(1, len(super_data[i])):
 
             super_data[i][j] = float(super_data[i][j])
+
 
 main()
