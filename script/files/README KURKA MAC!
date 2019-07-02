@@ -2,7 +2,7 @@
 
 Kolejnosc odpalania WAZNYCH skryptow
 
-1) WOLUMEN AKCJI - zaciaga najnowsze dane z gieldy (BOS bank) i tworzy podfoldery to danych - odpalany raz na dzien, i ewentualnie po 18 kazdego dnia (bo wtedy schodza wyniki z dzisiaj)
+1) DOWNLOAD AKCJI (BOS)- zaciaga najnowsze dane z gieldy (BOS bank) i tworzy podfoldery to danych - odpalany raz na dzien, i ewentualnie po 18 kazdego dnia (bo wtedy schodza wyniki z dzisiaj)
 
 2) CZYTANIE HISTORII SPOLKI - tworzy dane ktore sa eksportowane to tablicy raport (SQL na serwerze) WAZNE day_param dla pierwszego uruchomienia (gdy baza jest pusta) musi wynosic 350 (co daje okolo roku danych)
 
