@@ -9,6 +9,7 @@ seleniumfolder = 'C:/selenium/'
 def start():
     while True:
         main()
+        break
 
 
 def main():

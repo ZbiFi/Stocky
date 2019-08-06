@@ -126,19 +126,42 @@ def analyze_data(company_name, day_param_iterator):
     temp_value_for_i = 0
     max_value.clear()
     progression = 0
+    skip = False
     for i in range(len(super_data)):
         if(int(todayStr2)-timelapse) > int(super_data[i][1]):
             days_in_year = i
             break
 
-    for j in range(days_in_year):
+
+
+    for j in range(days_in_year):     #  main loop - most heavy in timeload
+
+        time_start = time.time()
         temp_var = days_in_year+j
-        for i in range(j, temp_var):
+
+        # date_list.append(int(super_data[j][1]))
+
+        # if already exist continue()
+        # print (str((super_data[j][0])) + str(int(super_data[j][1])))
+        #print(check_if_record_already_exist_2(int(super_data[j][1]),str(super_data[j][0])));
+
+        # if check_if_record_already_exist_2(int(super_data[j][1]),str(super_data[j][0])):
+
+          #  time_end = time.time()
+         #   print ("Exist")
+          #  #print(str(time_end - time_start) + " Time 2 loop in analyze")
+          #  skip = True
+          #  continue
+
+
+        # print (day_param)
+        for i in range(j, temp_var):  # loop for creating data_list - list of company value in 1 y window offset by j (for 2 years span analysis)
             if i == len(super_data)-1:
                 break
             data_list.append(super_data[i][5])
 
         temp_max_value = 0
+        # print (super_data[j])
         df = pd.DataFrame(data_list)
         lower_list.append(float(df.quantile(0.33)))
         upper_list.append(float(df.quantile(0.66)))
@@ -149,12 +172,14 @@ def analyze_data(company_name, day_param_iterator):
                 temp_max_value = float(data_list[len(data_list)-1-k])
         max_value.append(temp_max_value)
         data_list.clear()
+
+
     highest = max(lets_say_current_list)
     lowest = min(lets_say_current_list)
 
-    if 1 == 1:  # not check_if_record_already_exist_2(date_list[day_param], company_name):
+    if 1 == 1 : #and not skip:
 
-        # print ("Not exists")
+        #print ("Not exists")
 
         for i in reversed(range(day_param_iterator, len(lower_list))):
 
@@ -212,6 +237,9 @@ def analyze_data(company_name, day_param_iterator):
         
             temp_value_for_i = i
 
+        time_end = time.time()
+
+        #print(str(time_end - time_start) + " Time 2 loop in analyze")
         # checking for max range of dates in comp history ex if company is 30 days on market,but users checks for 45days
         if int(day_param_iterator) < len(lower_list):
 
@@ -220,7 +248,7 @@ def analyze_data(company_name, day_param_iterator):
 
             if check_if_record_already_exist(output):
                 print("RECORD ALREADY EXISTS:" + str(output))
-            else:            
+            else:
                 global last_oid, last_id
                 insert_into_mysql_db(last_oid, last_id, output)
                 last_oid, last_id = select_last_from_mysql_db("raport")
@@ -358,10 +386,12 @@ def import_names_from_file():
 def import_data_from_file(company_name):
     
     i = 0
+    time_start = time.time()
     timelapse = 20000  # 2 lata dla analizy na 1 rok
     # filename = 'C:\\selenium\\'+company_name+'.csv' # stooq data
     filename = selenium_url + 'ALL/'+company_name+'.mst'  # BOS data
     # filename = 'C:\\selenium\\ALL\\'+company_name+'.mst' # BOS data
+
     with open(filename, 'r') as f:
         reader = csv.reader(f)
         super_data.clear()
@@ -373,10 +403,14 @@ def import_data_from_file(company_name):
                 i += 1
             else:
                 break
+
     for i in range(len(super_data)):
         for j in range(1, len(super_data[i])):
 
             super_data[i][j] = float(super_data[i][j])
 
+    time_end = time.time()
+
+    # print(str(time_end - time_start) + " import from file")
 
 main()
