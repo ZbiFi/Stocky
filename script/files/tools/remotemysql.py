@@ -36,10 +36,10 @@ import mysql.connector
 # print (myresult)
 
 mydb = mysql.connector.connect(
-host=" remotemysql.com",
-user="zr00HYpK6O",
-passwd="SOdKgWqLJr",
-database="zr00HYpK6O"
+host = " remotemysql.com",
+user = "wdswq04F2c",
+passwd = "eMlH63DR0s",
+database = "wdswq04F2c"
 )
 
 sql1 = "CREATE TABLE IF NOT EXISTS raport ( raport_oid int(11), raport_id int(11), date int(11), company_name varchar(45), current_value float, current_status varchar(45), previous_status varchar(45) , Streak int(11), special_value float, Perct_special_value float, bottom_price_channel float, upper_price_channel float, max_value float)"

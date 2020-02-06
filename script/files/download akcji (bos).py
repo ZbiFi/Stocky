@@ -31,15 +31,15 @@ def manage_download_all():
             return
 
     fullfilename = os.path.join(seleniumfolder, "ALL" + '.zip')
-    # fullfilename_2 = os.path.join(seleniumfolder, "TRYPLN" + '.csv')
+    fullfilename_2 = os.path.join(seleniumfolder, "TRYPLN" + '.csv')
     if not os.path.exists(seleniumfolder):
         os.makedirs(seleniumfolder)
         os.makedirs(seleniumfolder + "ALL")
     urllib.request.urlretrieve('http://bossa.pl/pub/metastock/mstock/mstall.zip', fullfilename)
     print("downloaded ALL")
 
-    # urllib.request.urlretrieve('https://stooq.pl/q/d/l/?s=trypln&i=d', fullfilename_2)
-    # print("downloaded TRYPLN")
+    urllib.request.urlretrieve('https://stooq.pl/q/d/l/?s=trypln&i=d', fullfilename_2)
+    print("downloaded TRYPLN")
     if os.path.exists(filename):
         zip_ref = zipfile.ZipFile(seleniumfolder + "ALL" + '.zip', 'r')
         zip_ref.extractall(seleniumfolder + "ALL")
