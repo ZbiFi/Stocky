@@ -1,61 +1,47 @@
 import time
 import datetime as dt
-import csv
 import pandas as pd
-from script.files.db_cursos import main as db_cursos
+from script.files import DBCursos
 from script.files import ImportNamesFromFile
-import mysql.connector
-
-selenium_url = 'C:/selenium/'
-filename_url_part1 = selenium_url + 'Benefit.mst'
+from script.files import ImportDataFromFile
+from script.files import NumberOfDayMenu
+from script.files import DaysInYear
+from script.files import ConfigFile
+from script.files import SQLDICT
 
 today = dt.datetime.now().date()
 todayStr = str(today)
 todayStr2 = todayStr.replace("-", "")
-super_data = []
+
+company_data_from_two_years = []
 data_list = []
 lower_list = []
 upper_list = []
 lets_say_current_list = []
 date_list = []
 curr_2year = []
-companies_list = []
+# companies_list = []
 # day_param = 350 # - year
-day_param = 1
+#day_param = 1
 
-while True:
+day_param = NumberOfDayMenu.days_choice()
 
-    print("Please provide number of days from now for DB import: (1-350) default: 1 ")
-    choice = input()
+config_dict = ConfigFile.load_config()
 
-    if choice == "":
-        break
-    else:
-        choice = int(choice)
+online_mode = int(config_dict['online_mode'])
 
-    if 1 <= choice <= 350:
-        day_param = choice
-        break
-
-# # parameters for sql connection
-# host_param = "remotemysql.com"
-# user_param = "wdswq04F2c"
-# passwd_param = "eMlH63DR0s"
-# database_param = "wdswq04F2c"
-#
-# mydb = mysql.connector.connect(
-#  host=host_param,
-#  user=user_param,
-#  passwd=passwd_param,
-#  database=database_param
-# )
-#
-# mycursor = mydb.cursor()
-
-mydb,mycursor,database_param = db_cursos()
+if online_mode == 1:
+    mydb, mycursor, database_param = DBCursos.main()
+else:
+    mydb, mycursor, database_param = 0,0,0
 
 last_id = -1
 last_oid = -1
+
+# sql_data = SQLDICT.getdict()
+# querry = sql_data['maxoids']
+# mycursor.execute(querry)
+# print(mycursor.fetchall())
 
 
 def select_last_from_mysql_db(table_name):
@@ -75,20 +61,19 @@ def read_raports():
     # 0 - test 1 - full
     companies_list = ImportNamesFromFile.import_names_from_file(1)
     time_table = []
+    global company_data_from_two_years
 
     for k in range(day_param):
         print(str(k) + " from " + str(day_param))
         time_start = time.time()
         for i in range(len(companies_list)):
 
-            super_data.clear()
             data_list.clear()
             lower_list.clear()
             upper_list.clear()
             lets_say_current_list.clear()
             date_list.clear()
-
-            import_data_from_file(str(companies_list[i][0]))
+            company_data_from_two_years = ImportDataFromFile.import_data_from_file(str(companies_list[i][0]))
             analyze_data(companies_list[i][0], k)
 
         time_end = time.time()
@@ -100,7 +85,7 @@ def read_raports():
 
 def analyze_data(company_name, day_param_iterator):
 
-    timelapse = 10000
+    time_lapse = 10000
     global max_value
     days_in_year = 0
     current_status = ""
@@ -120,10 +105,12 @@ def analyze_data(company_name, day_param_iterator):
     max_value.clear()
     progression = 0
     # skip = False
-    for i in range(len(super_data)):
-        if(int(todayStr2)-timelapse) > int(super_data[i][1]):
-            days_in_year = i
-            break
+
+    days_in_year = DaysInYear.days_in_year(company_data_from_two_years)
+    # for i in range(len(super_data)):
+    #    if(int(todayStr2)-time_lapse) > int(super_data[i][1]):
+    #        days_in_year = i
+    #        break
 
     #  main loop - most heavy in timeload
     for j in range(days_in_year):
@@ -147,16 +134,17 @@ def analyze_data(company_name, day_param_iterator):
 
         # print (day_param)
         for i in range(j, temp_var):  # loop for creating data_list - list of company value in 1 y window offset by j (for 2 years span analysis)
-            if i == len(super_data)-1:
+            if i == len(company_data_from_two_years)-1:
                 break
-            data_list.append(super_data[i][5])
+            data_list.append(company_data_from_two_years[i][5])
 
         temp_max_value = 0
         # print (super_data[j])
+        # print(len(data_list))
         df = pd.DataFrame(data_list)
         lower_list.append(float(df.quantile(0.33)))
         upper_list.append(float(df.quantile(0.66)))
-        date_list.append(int(super_data[j][1]))  # !!!!!!wrzucic do petli for i->powinno dzialac
+        date_list.append(int(company_data_from_two_years[j][1]))  # !!!!!!wrzucic do petli for i->powinno dzialac
         lets_say_current_list.append(data_list[0])
         for k in range(buffor_day_range):
             if float(data_list[len(data_list)-1-k]) > float(temp_max_value):
@@ -236,16 +224,19 @@ def analyze_data(company_name, day_param_iterator):
         if int(day_param_iterator) < len(lower_list):
 
             output = [date_list[temp_value_for_i], company_name, "Current Value: ", lets_say_current_list[temp_value_for_i], "Current status", current_status, "Previous status", previous_status, "Streak", progression, low_max_text, low_max_value, special_text, special_value, "Lower Price Channel", lower_list[temp_value_for_i], "Upper Price Channel", upper_list[temp_value_for_i], max_value[day_param_iterator]]
-            analyze_price_channel(output)
-
-            if check_if_record_already_exist(output):
-                print("RECORD ALREADY EXISTS:" + str(output))
+            # analyze_price_channel(output)
+            if online_mode == 1:
+                if check_if_record_already_exist(output):
+                    print("RECORD ALREADY EXISTS:" + str(output))
+                else:
+                    global last_oid, last_id
+                    insert_into_mysql_db(last_oid, last_id, output)
+                    last_oid, last_id = select_last_from_mysql_db("raport")
             else:
-                global last_oid, last_id
-                insert_into_mysql_db(last_oid, last_id, output)
-                last_oid, last_id = select_last_from_mysql_db("raport")
+                print(output)
 
 
+# NOT USED RIGHT NOW
 def analyze_price_channel(output):
 
     text = ""
@@ -322,7 +313,9 @@ def analyze_price_channel(output):
 def main():
 
     global last_oid, last_id, max_value
-    last_oid, last_id = select_last_from_mysql_db("raport")
+    if online_mode == 1:
+        last_oid, last_id = select_last_from_mysql_db("raport")
+
     max_value = []
     read_raports()
 
@@ -363,36 +356,6 @@ def check_if_record_already_exist_2(date, company_name):
         return True
     else:
         return False
-
-
-def import_data_from_file(company_name):
-    
-    i = 0
-    # time_start = time.time()
-    timelapse = 20000  # 2 lata dla analizy na 1 rok
-    # filename = 'C:\\selenium\\'+company_name+'.csv' # stooq data
-    filename = selenium_url + 'ALL/'+company_name+'.mst'  # BOS data
-    # filename = 'C:\\selenium\\ALL\\'+company_name+'.mst' # BOS data
-
-    with open(filename, 'r') as f:
-        reader = csv.reader(f)
-        super_data.clear()
-        f.readline()
-
-        for row in reversed(list(reader)):
-            if (int(todayStr2) - timelapse) <= int(row[1]):
-                super_data.append(row)
-                i += 1
-            else:
-                break
-
-    for i in range(len(super_data)):
-        for j in range(1, len(super_data[i])):
-
-            super_data[i][j] = float(super_data[i][j])
-
-    # time_end = time.time()
-    # print(str(time_end - time_start) + " import from file")
 
 
 if __name__ == '__main__':

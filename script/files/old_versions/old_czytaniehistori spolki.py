@@ -13,7 +13,7 @@ filename_url_part1 = selenium_url + 'Benefit.mst'
 today = dt.datetime.now().date()
 todayStr = str(today)
 todayStr2 = todayStr.replace("-","")
-super_data = []
+company_data_from_two_years = []
 data_list = []
 lower_list = []
 upper_list = []
@@ -89,7 +89,7 @@ def read_raports():
         for i in range(len(companies_list)):
             #print(companies_list)
             #if (k<var_for_k_param):
-            super_data.clear()
+            company_data_from_two_years.clear()
             data_list.clear()
             lower_list.clear()
             upper_list.clear()
@@ -157,17 +157,17 @@ def analyze_data(company_name,day_param):
     max_value.clear(); 
     progression=0;
     change_status=1;
-    for i in range (len(super_data)):
-        if((int(todayStr2)-timelapse)>int(super_data[i][1])):
+    for i in range (len(company_data_from_two_years)):
+        if((int(todayStr2)-timelapse)>int(company_data_from_two_years[i][1])):
             days_in_year =(i)
             break
 
     for j in range (days_in_year):
         temp_var = days_in_year+j
         for i in range (j,temp_var):
-            if (i==len(super_data)-1):
+            if (i==len(company_data_from_two_years)-1):
                 break
-            data_list.append(super_data[i][5])
+            data_list.append(company_data_from_two_years[i][5])
 
         temp_max_value=0;
         #print (len(data_list))
@@ -177,7 +177,7 @@ def analyze_data(company_name,day_param):
         #print(j,i,super_data[i][1])
         #print(super_data)
         #print(j,i)
-        date_list.append(int(super_data[j][1]))#!!!!!!wrzucic do petli for i->powinno dzialac
+        date_list.append(int(company_data_from_two_years[j][1]))#!!!!!!wrzucic do petli for i->powinno dzialac
         #print(data_list[0])
         lets_say_current_list.append(data_list[0])
         #max_value=max(map(float,data_list[0]))
@@ -490,8 +490,8 @@ def import_data_from_file(company_name):
     #filename = 'C:\\selenium\\ALL\\'+company_name+'.mst' # BOS data
     with open(filename,'r') as f:
         reader =csv.reader(f)
-        super_data
-        super_data.clear()
+        company_data_from_two_years
+        company_data_from_two_years.clear()
         #print(super_data)
         f.readline()
         temporary_number=0
@@ -500,7 +500,7 @@ def import_data_from_file(company_name):
          #   if (j<=temporary_number):
          #(int(todayStr2)-10000)
             if ((int(todayStr2)-timelapse)<=int(row[1])):
-                super_data.append(row)
+                company_data_from_two_years.append(row)
                     #print(super_data[0])
                     #print (super_data[i][1])
                 i+=1
@@ -508,12 +508,12 @@ def import_data_from_file(company_name):
                 break
           #  j+=1
         #print(super_data)
-    for i in range (len(super_data)):
-        for j in range (1,len(super_data[i])):
+    for i in range (len(company_data_from_two_years)):
+        for j in range (1, len(company_data_from_two_years[i])):
             #if (isinstance(super_data[i][j], str)):
             # print("dupa")
                 #break
             #print(super_data)
-            super_data[i][j]=float(super_data[i][j])
+            company_data_from_two_years[i][j]=float(company_data_from_two_years[i][j])
 
 main()

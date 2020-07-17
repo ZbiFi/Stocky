@@ -1,8 +1,10 @@
 import csv
 
+
 def import_names_from_file(import_type):
 
     companies_list = []
+    filename = ''
     # test
     if import_type == 0:
         filename = 'test_companies.txt'

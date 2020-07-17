@@ -15,7 +15,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 
-super_data = []
+company_data_from_two_years = []
 price_channel = []
 #super_data = [10,20,20,20,10,20,10,30,10,10,10,20,20,15,10,20,10]
 #super_data = [1,2,1,2,3,2,3,4,3,4,5,4,5,6,5,6,7]
@@ -569,8 +569,8 @@ def import_data_from_file(time_lapse,company_symbol,company_name):
     filename = seleniumfolder + 'ALL/' + company_name+'.mst'
     with open(filename,'r') as f:
         reader =csv.reader(f)
-        super_data
-        super_data.clear()
+        company_data_from_two_years
+        company_data_from_two_years.clear()
         #print(super_data)
         f.readline()
         temporary_number=0
@@ -578,7 +578,7 @@ def import_data_from_file(time_lapse,company_symbol,company_name):
         for row in reversed(list(reader)):
          #   if (j<=temporary_number):            
             if (i<time_lapse):
-                super_data.append(row)
+                company_data_from_two_years.append(row)
                     #print(super_data[0])
                     #print (super_data[i][1])
                 i+=1
@@ -586,13 +586,13 @@ def import_data_from_file(time_lapse,company_symbol,company_name):
                 break
           #  j+=1
         #print(super_data)
-    for i in range (len(super_data)):
-        for j in range (1,len(super_data[i])):
+    for i in range (len(company_data_from_two_years)):
+        for j in range (1, len(company_data_from_two_years[i])):
             #if (isinstance(super_data[i][j], str)):
             # print("dupa")
                 #break
             #print(super_data)
-            super_data[i][j]=float(super_data[i][j])
+            company_data_from_two_years[i][j]=float(company_data_from_two_years[i][j])
                 #print (super_data[i][j])
     #print (super_data)
 
@@ -666,16 +666,16 @@ def analyze_data (company_symbol,block_size,block_step,string,time_lapse):
     #data_string_2 = ""
     #print("SUP",len(super_data))
     if (data_string == "volume"):
-        for i in range (len(super_data)):
+        for i in range (len(company_data_from_two_years)):
             #print(super_data[i],i)
             #print ("Volume: ", super_data[i][5])
             #data_list.append(super_data[i][5])  # stooq data
-            data_list.append(super_data[i][6])  # stooq data
+            data_list.append(company_data_from_two_years[i][6])  # stooq data
             data_string_2="VOLUME "
     if (data_string == "end_price"):
-        for i in range (len(super_data)):
+        for i in range (len(company_data_from_two_years)):
             #print ("End_price: ", super_data[i][4])
-            data_list.append(super_data[i][5])  # stooq data
+            data_list.append(company_data_from_two_years[i][5])  # stooq data
             #data_list.append(super_data[i][5])  # stooq data
             data_string_2="END PRICE "
         #print(data_list)
@@ -709,7 +709,7 @@ def analyze_data (company_symbol,block_size,block_step,string,time_lapse):
     min_val=min(data_list)
     max_val=max(data_list)
     #print(len(super_data))
-    last_obj=len(super_data)-1
+    last_obj= len(company_data_from_two_years) - 1
     last_val=data_list[0]
     #print(price_channel)
     blocks = []
