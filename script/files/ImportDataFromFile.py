@@ -1,6 +1,7 @@
 import datetime as dt
 import csv
 from script.files import ConfigFile
+from os.path import exists
 
 
 def import_data_from_file(company_name):
@@ -17,23 +18,29 @@ def import_data_from_file(company_name):
 
     filename = selenium_url + 'ALL/'+company_name+'.mst'  # BOS data
 
-    with open(filename, 'r') as f:
-        reader = csv.reader(f)
-        super_data.clear()
-        f.readline()
+    if exists(filename):
+        with open(filename, 'r') as f:
+            reader = csv.reader(f)
+            super_data.clear()
+            f.readline()
 
-        for row in reversed(list(reader)):
-            if (int(today_string) - two_year_span) <= int(row[1]):
-                super_data.append(row)
-                i += 1
-            else:
-                break
+            for row in reversed(list(reader)):
+                if (int(today_string) - two_year_span) <= int(row[1]):
+                    super_data.append(row)
+                    i += 1
+                else:
+                    break
 
-    # converting data to float
-    for i in range(len(super_data)):
-        for j in range(1, len(super_data[i])):
-            super_data[i][j] = float(super_data[i][j])
+        # converting data to float
+        for i in range(len(super_data)):
+            for j in range(1, len(super_data[i])):
+                super_data[i][j] = float(super_data[i][j])
 
-    return super_data
+        return super_data
+
+    else:
+
+        print(f' {company_name} is no longer is being traded/watched')
+        return []
 
 # import_data_from_file('BENEFIT')

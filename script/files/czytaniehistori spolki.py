@@ -18,6 +18,7 @@ data_list = []
 lower_list = []
 upper_list = []
 lets_say_current_list = []
+outputsArray = []
 date_list = []
 curr_2year = []
 # companies_list = []
@@ -76,6 +77,9 @@ def read_raports():
             company_data_from_two_years = ImportDataFromFile.import_data_from_file(str(companies_list[i][0]))
             analyze_data(companies_list[i][0], k)
 
+        sortedOutputsArray = sorted(outputsArray, key=lambda x: x[-1])
+        for output in sortedOutputsArray:
+            print(output)
         time_end = time.time()
 
         time_table.append(time_end - time_start)
@@ -115,35 +119,17 @@ def analyze_data(company_name, day_param_iterator):
     #  main loop - most heavy in timeload
     for j in range(days_in_year):
 
-        # time_start = time.time()
         temp_var = days_in_year+j
 
-        # date_list.append(int(super_data[j][1]))
-
-        # if already exist continue()
-        # print (str((super_data[j][0])) + str(int(super_data[j][1])))
-        # print(check_if_record_already_exist_2(int(super_data[j][1]),str(super_data[j][0])));
-
-        # if check_if_record_already_exist_2(int(super_data[j][1]),str(super_data[j][0])):
-
-        #  time_end = time.time()
-        #   print ("Exist")
-        #  #print(str(time_end - time_start) + " Time 2 loop in analyze")
-        #  skip = True
-        #  continue
-
-        # print (day_param)
         for i in range(j, temp_var):  # loop for creating data_list - list of company value in 1 y window offset by j (for 2 years span analysis)
             if i == len(company_data_from_two_years)-1:
                 break
             data_list.append(company_data_from_two_years[i][5])
 
         temp_max_value = 0
-        # print (super_data[j])
-        # print(len(data_list))
         df = pd.DataFrame(data_list)
-        lower_list.append(float(df.quantile(0.33)))
-        upper_list.append(float(df.quantile(0.66)))
+        lower_list.append(df.quantile(0.33).values.min())
+        upper_list.append(df.quantile(0.66).values.min())
         date_list.append(int(company_data_from_two_years[j][1]))  # !!!!!!wrzucic do petli for i->powinno dzialac
         lets_say_current_list.append(data_list[0])
         for k in range(buffor_day_range):
@@ -152,10 +138,11 @@ def analyze_data(company_name, day_param_iterator):
         max_value.append(temp_max_value)
         data_list.clear()
 
-    # print(lets_say_current_list)
-    # if len(lets_say_current_list)>0:
-    highest = max(lets_say_current_list)
-    lowest = min(lets_say_current_list)
+    if len(lets_say_current_list)>0:
+        highest = max(lets_say_current_list)
+        lowest = min(lets_say_current_list)
+    else:
+        return
 
     if 1 == 1:
 
@@ -233,8 +220,8 @@ def analyze_data(company_name, day_param_iterator):
                     insert_into_mysql_db(last_oid, last_id, output)
                     last_oid, last_id = select_last_from_mysql_db("raport")
             else:
-                print(output)
-
+                analyze_price_channel(output)
+                outputsArray.append(output)
 
 # NOT USED RIGHT NOW
 def analyze_price_channel(output):
