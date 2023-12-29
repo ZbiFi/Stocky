@@ -2,7 +2,7 @@ import datetime as dt
 from script.files import ConfigFile
 
 
-def days_in_year(super_data):
+def daysInYear(super_data):
     # Active days of company on stock
 
     config_dict = ConfigFile.load_config()

@@ -274,7 +274,7 @@ def analyze_data(company_name,day_param):
         
         if (int(day_param)<len(lower_list)):
                             
-            output =[date_list[temp_value_for_i],company_name,"Current Value: ", lets_say_current_list[temp_value_for_i], "Current status", current_status,"Previous status",previous_status,"Streak",progression,low_max_text,low_max_value,special_text,special_value,"Lower Price Channel",lower_list[i],"Upper Price Channel",upper_list[i],max_value[day_param]]
+            output =[date_list[temp_value_for_i],company_name,"Current Value:", lets_say_current_list[temp_value_for_i], "Current status", current_status,"Previous status",previous_status,"Streak",progression,low_max_text,low_max_value,special_text,special_value,"Lower Price Channel",lower_list[i],"Upper Price Channel",upper_list[i],max_value[day_param]]
         #print(company_name,output)
             analyze_price_channel(output)
 

@@ -1,3 +1,4 @@
+import csv
 import time
 import datetime as dt
 import pandas as pd
@@ -13,7 +14,7 @@ today = dt.datetime.now().date()
 todayStr = str(today)
 todayStr2 = todayStr.replace("-", "")
 
-company_data_from_two_years = []
+
 data_list = []
 lower_list = []
 upper_list = []
@@ -56,30 +57,42 @@ def select_last_from_mysql_db(table_name):
     else:
         return myresult[0]
     
+def writeToFile(data):
+    filename = 'output.csv'
+
+    with open(filename, 'w', newline='') as csvfile:
+        for singleRow in data:
+            spamwriter = csv.writer(csvfile)
+            row = [str(singleRow).replace('[', '').replace(']', '').replace(',', '|').replace('\'', '').replace('| ', '|').replace('.', ',')]
+            spamwriter.writerow(singleRow)
 
 def read_raports():
 
     # 0 - test 1 - full
     companies_list = ImportNamesFromFile.import_names_from_file(1)
     time_table = []
-    global company_data_from_two_years
 
     for k in range(day_param):
         print(str(k) + " from " + str(day_param))
         time_start = time.time()
-        for i in range(len(companies_list)):
+        for company in companies_list:
 
+            time_comp_start = time.time()
             data_list.clear()
             lower_list.clear()
             upper_list.clear()
-            lets_say_current_list.clear()
             date_list.clear()
-            company_data_from_two_years = ImportDataFromFile.import_data_from_file(str(companies_list[i][0]))
-            analyze_data(companies_list[i][0], k)
+            company_data_from_two_years = ImportDataFromFile.import_data_from_file(str(company[0]))
+            analyze_data(company[0], k, company_data_from_two_years)
+            time_comp_end = time.time()
+            # print(time_comp_end - time_comp_start)
 
-        sortedOutputsArray = sorted(outputsArray, key=lambda x: x[-1])
-        for output in sortedOutputsArray:
-            print(output)
+        print(str(round(100 * ((k + 1) / day_param), 3)) + '% Complete')
+        if online_mode == 0:
+            sortedOutputsArray = sorted(outputsArray, key=lambda x: x[-1])
+            # for output in sortedOutputsArray:
+            #     print(output)
+            writeToFile(sortedOutputsArray)
         time_end = time.time()
 
         time_table.append(time_end - time_start)
@@ -87,7 +100,7 @@ def read_raports():
     print(time_table)
 
 
-def analyze_data(company_name, day_param_iterator):
+def analyze_data(company_name, day_param_iterator, company_data_from_two_years):
 
     time_lapse = 10000
     global max_value
@@ -103,6 +116,7 @@ def analyze_data(company_name, day_param_iterator):
     output.clear()
     low_max_text = ""
     low_max_value = 0
+    lets_say_current_list = []
     special_text = ""
     special_value = 0
     temp_value_for_i = 0
@@ -110,15 +124,17 @@ def analyze_data(company_name, day_param_iterator):
     progression = 0
     # skip = False
 
-    days_in_year = DaysInYear.days_in_year(company_data_from_two_years)
+    days_in_year = DaysInYear.daysInYear(company_data_from_two_years)
     # for i in range(len(super_data)):
     #    if(int(todayStr2)-time_lapse) > int(super_data[i][1]):
     #        days_in_year = i
     #        break
 
     #  main loop - most heavy in timeload
+    time_comp_start = time.time()
+    timeJ = []
     for j in range(days_in_year):
-
+        time_j_start = time.time()
         temp_var = days_in_year+j
 
         for i in range(j, temp_var):  # loop for creating data_list - list of company value in 1 y window offset by j (for 2 years span analysis)
@@ -137,12 +153,18 @@ def analyze_data(company_name, day_param_iterator):
                 temp_max_value = float(data_list[len(data_list)-1-k])
         max_value.append(temp_max_value)
         data_list.clear()
+        time_j_end = time.time()
+        # print(f'TimeJ: ' + str(time_j_end-time_j_start))
+        timeJ.append(time_j_end - time_j_start)
 
     if len(lets_say_current_list)>0:
         highest = max(lets_say_current_list)
         lowest = min(lets_say_current_list)
     else:
         return
+
+    time_comp_end = time.time()
+    # print(f'Main loop: ' + str(time_comp_end-time_comp_start))
 
     if 1 == 1:
 
@@ -210,7 +232,7 @@ def analyze_data(company_name, day_param_iterator):
         # checking for max range of dates in comp history ex if company is 30 days on market,but users checks for 45days
         if int(day_param_iterator) < len(lower_list):
 
-            output = [date_list[temp_value_for_i], company_name, "Current Value: ", lets_say_current_list[temp_value_for_i], "Current status", current_status, "Previous status", previous_status, "Streak", progression, low_max_text, low_max_value, special_text, special_value, "Lower Price Channel", lower_list[temp_value_for_i], "Upper Price Channel", upper_list[temp_value_for_i], max_value[day_param_iterator]]
+            output = [date_list[temp_value_for_i], company_name, "Current Value:", lets_say_current_list[temp_value_for_i], "Current status", current_status, "Previous status", previous_status, "Streak", progression, low_max_text, low_max_value, special_text, special_value, "Lower Price Channel", lower_list[temp_value_for_i], "Upper Price Channel", upper_list[temp_value_for_i], max_value[day_param_iterator]]
             # analyze_price_channel(output)
             if online_mode == 1:
                 if check_if_record_already_exist(output):
