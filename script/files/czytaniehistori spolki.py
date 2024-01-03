@@ -1,4 +1,5 @@
 import csv
+import datetime
 import time
 import datetime as dt
 import pandas as pd
@@ -58,7 +59,16 @@ def select_last_from_mysql_db(table_name):
         return myresult[0]
     
 def writeToFile(data):
-    filename = 'output.csv'
+
+    if day_param > 1:
+        prefix = str(day_param) + '_multi_'
+    else:
+        prefix = 'single_'
+
+    dataString = str(datetime.date.today())
+    prefix = ''
+    dataString = ''
+    filename = prefix + 'output' + dataString + '.csv'
 
     with open(filename, 'w', newline='') as csvfile:
         for singleRow in data:
