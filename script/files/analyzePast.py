@@ -1,7 +1,7 @@
 from numpy import mean
 
 from script.files import ImportNamesFromFile, LoadArchiveDataFromFile
-
+import datetime as dt
 
 def conditions(isBuy, conditionBuy, conditionSell, data):
 
@@ -58,6 +58,7 @@ def findBestOptions():
     cutOff2 = False
     headers = ['BUY TYPE', 'SELL TYPE', 'SUM PROFIT IN %', 'EFFICIENCY', 'PROFIT FROM CLOSED TRANS', 'PROFIT FROM OPEN TRANS IN DIFF']
     format_row = "{:<30}" * (len(headers))
+    print(f'Analysis from {dt.datetime.now().date() - dt.timedelta(days = 1)} to {dt.datetime.now().date() - dt.timedelta(days = 365)}')
     print(format_row.format(*headers))
     returnedROIValuesSorted = sorted(returnedROIValues, key=lambda x: x[2], reverse=True)
     for row in returnedROIValuesSorted:
@@ -72,7 +73,7 @@ def findBestOptions():
             cutOff2=True
         print(format_row.format(*row))
 
-    print(f'EFFICIENCY to miara ile tranzakcji zostało zamkniętych w ostatnim roku (wymagana para buy and sell), co nie zostało zamknięte ląduje w OPEN TRANS')
+    print(f'EFFICIENCY to miara ile tranzakcji zostało zamkniętych w ostatnim roku (wymagana para buy and sell) do ilości trakzakcji kupna, co nie zostało zamknięte ląduje w OPEN TRANS')
     return
 
 def analyzePast(conditionBuyValue= 3, conditionSellValue=3, manual= True):
@@ -130,7 +131,7 @@ def analyzePast(conditionBuyValue= 3, conditionSellValue=3, manual= True):
     restOpenList = []
     for pair in pairWithLastKnownValue:
         # print(pair)
-        profit = round((float(pair[0][3]) / float(pair[1][3]) * 100), 2)
+        profit = round((float(pair[1][3]) / float(pair[0][3]) * 100), 2)
         restOpenList.append(profit)
     # print(restOpenList)
 
@@ -146,6 +147,9 @@ def analyzePast(conditionBuyValue= 3, conditionSellValue=3, manual= True):
     profilorLoss = round((part1 * part2) + (part3 * part4), 3)
 
     if manual:
+
+        full = False
+
         print('Buy signals: ' + str(buySignal))
         print('Pairs found: ' + str(len(pairFound)))
         print('ConditionBuy: ' + str(conditionBuyValue))
@@ -155,12 +159,25 @@ def analyzePast(conditionBuyValue= 3, conditionSellValue=3, manual= True):
         print('Average change of value for rest open: ' + str(avarageChangeForValueForOpen) + '%')
         print('Profit/Loss: ' + str(profilorLoss))
 
+        i=0
         for pair in pairFound:
-            print(pair)
+            i+=1
+            if full:
+                print(f'{i} {pair}')
+            else:
+                print(f'{i} BOUGHT {[pair[0][0], pair[0][1], pair[0][2], pair[0][3]]} SOLD {[pair[1][0], pair[1][1], pair[1][2], pair[1][3]]}')
+            profit = round((float(pair[1][3]) / float(pair[0][3]) * 100), 2)
+            print(f'{i} {profit}')
 
         print()
         for pair in pairWithLastKnownValue:
-            print(pair)
+            i += 1
+            if full:
+                print(f'{i} {pair}')
+            else:
+                print(f'{i} BOUGHT {[pair[0][0], pair[0][1], pair[0][2], pair[0][3]]} ON HOLD {[pair[1][0], pair[1][1], pair[1][2], pair[1][3]]}')
+            profit = round((float(pair[1][3]) / float(pair[0][3]) * 100), 2)
+            print(f'{i} {profit}')
 
     return [conditionBuyValue, conditionSellValue, efficiencyReturnValue, avarageProfitReturnValue, avarageChangeForValueForOpen, pairFound, pairWithLastKnownValue]
 
