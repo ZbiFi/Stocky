@@ -53,10 +53,23 @@ def findBestOptions():
             profilorLoss = (part1*part2)+(part3*part4)
             returnedROIValues.append([i, j, round(float(profilorLoss), 3), round(analyzePast(i, j, False)[2]/100, 2), round(analyzePast(i, j, False)[3]/100, 2), round(analyzePast(i, j, False)[4]/100, 2)])
 
-    headers = ['BUY TYPE', 'SELL TYPE', 'SUM PROFIT IN %', 'EFFICIENCY', 'PROFIT FROM CLOSED TRANS %', 'PROFIT FROM OPEN TRANS IN DIFF']
+    cutOff0 = False
+    cutOff1 = False
+    cutOff2 = False
+    headers = ['BUY TYPE', 'SELL TYPE', 'SUM PROFIT IN %', 'EFFICIENCY', 'PROFIT FROM CLOSED TRANS', 'PROFIT FROM OPEN TRANS IN DIFF']
     format_row = "{:<30}" * (len(headers))
     print(format_row.format(*headers))
-    for row in returnedROIValues:
+    returnedROIValuesSorted = sorted(returnedROIValues, key=lambda x: x[2], reverse=True)
+    for row in returnedROIValuesSorted:
+        if row[2] >= 1.2 and not cutOff0:
+            print('STRONG STRATEGIES!')
+            cutOff0=True
+        if row[2] < 1.2 and not cutOff1:
+            print('MEDIUM STRATEGIES!')
+            cutOff1=True
+        if row[2] < 1.1 and not cutOff2:
+            print('WEAK STRATEGIES!')
+            cutOff2=True
         print(format_row.format(*row))
 
     print(f'EFFICIENCY to miara ile tranzakcji zostało zamkniętych w ostatnim roku (wymagana para buy and sell), co nie zostało zamknięte ląduje w OPEN TRANS')
@@ -100,10 +113,10 @@ def analyzePast(conditionBuyValue= 3, conditionSellValue=3, manual= True):
                 foundSellFlag = True
                 foundSell = data
             lastData = data
-        if foundBuyFlag and foundSellFlag:
-            foundBuyFlag = False
-            foundSellFlag = False
-            pairFound.append([foundBuy, foundSell])
+            if foundBuyFlag and foundSellFlag:
+                foundBuyFlag = False
+                foundSellFlag = False
+                pairFound.append([foundBuy, foundSell])
 
         if foundBuyFlag and not foundSellFlag:
             pairWithLastKnownValue.append([foundBuy, lastData])
@@ -140,9 +153,16 @@ def analyzePast(conditionBuyValue= 3, conditionSellValue=3, manual= True):
         print('Efficiency: ' + str(efficiencyReturnValue) + '%')
         print('Average profit: ' + str(avarageProfitReturnValue) + '%')
         print('Average change of value for rest open: ' + str(avarageChangeForValueForOpen) + '%')
-        print('Profit/Loss: ' + str(profilorLoss) + '%')
+        print('Profit/Loss: ' + str(profilorLoss))
 
-    return [conditionBuyValue, conditionSellValue, efficiencyReturnValue, avarageProfitReturnValue, avarageChangeForValueForOpen]
+        for pair in pairFound:
+            print(pair)
 
-# analyzePast(1,2)
+        print()
+        for pair in pairWithLastKnownValue:
+            print(pair)
+
+    return [conditionBuyValue, conditionSellValue, efficiencyReturnValue, avarageProfitReturnValue, avarageChangeForValueForOpen, pairFound, pairWithLastKnownValue]
+
+# analyzePast(2,0)
 findBestOptions()
