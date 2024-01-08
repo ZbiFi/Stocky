@@ -95,6 +95,7 @@ def read_raports():
             upper_list.clear()
             date_list.clear()
             company_data_from_two_years = ImportDataFromFile.import_data_from_file(str(company[0]))
+            analyze_data(company[0], k, company_data_from_two_years)
             time_comp_end = time.time()
             # print(time_comp_end - time_comp_start)
 

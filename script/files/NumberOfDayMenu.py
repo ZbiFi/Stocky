@@ -9,7 +9,7 @@ def days_choice():
 
     while True:
 
-        print("Please provide number of days from now for DB import: (1-350) default: 1 ")
+        print("Please provide number of days from now for DB import: (1-251) default: 1 ")
         choice = input()
 
         if choice == "":
