@@ -17,7 +17,7 @@ def conditions(isBuy, conditionBuy, conditionSell, data):
                 if data == 'BUY2':
                     return True
             case 3:
-                if data == 'BUY1' or data == 'BUY2' or data == 'BUY3':
+                if data == 'BUY1' or data == 'BUY2' or data == 'BUY':
                     return True
             case _:
                 return False
@@ -34,7 +34,7 @@ def conditions(isBuy, conditionBuy, conditionSell, data):
                 if data == 'SELL2':
                     return True
             case 3:
-                if data == 'SELL1' or data == 'SELL2' or data == 'SELL3':
+                if data == 'SELL1' or data == 'SELL2' or data == 'SELL':
                     return True
             case _:
                 return False
@@ -148,7 +148,7 @@ def analyzePast(conditionBuyValue= 3, conditionSellValue=3, manual= True):
 
     if manual:
 
-        full = False
+        full = not False
 
         print('Buy signals: ' + str(buySignal))
         print('Pairs found: ' + str(len(pairFound)))

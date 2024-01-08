@@ -17,7 +17,7 @@ def days_choice():
         else:
             choice = int(choice)
 
-        if 1 <= choice <= 350:
+        if 1 <= choice <= 251:
             day_param = choice
             break
 

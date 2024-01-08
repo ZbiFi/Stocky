@@ -1,5 +1,7 @@
 import csv
 import datetime
+import smtplib
+import ssl
 import time
 import datetime as dt
 import pandas as pd
@@ -36,7 +38,7 @@ online_mode = int(config_dict['online_mode'])
 if online_mode == 1:
     mydb, mycursor, database_param = DBCursos.main()
 else:
-    mydb, mycursor, database_param = 0,0,0
+    mydb, mycursor, database_param = 0, 0, 0
 
 last_id = -1
 last_oid = -1
@@ -93,22 +95,21 @@ def read_raports():
             upper_list.clear()
             date_list.clear()
             company_data_from_two_years = ImportDataFromFile.import_data_from_file(str(company[0]))
-            analyze_data(company[0], k, company_data_from_two_years)
             time_comp_end = time.time()
             # print(time_comp_end - time_comp_start)
 
         print(str(round(100 * ((k + 1) / day_param), 3)) + '% Complete')
         if online_mode == 0:
             sortedOutputsArray = sorted(outputsArray, key=lambda x: x[-1])
-            # for output in sortedOutputsArray:
-            #     print(output)
+            for output in sortedOutputsArray:
+                # if 'BUY2' in output or 'SELL' in output:
+                    print(output)
             writeToFile(sortedOutputsArray)
         time_end = time.time()
 
         time_table.append(time_end - time_start)
 
     print(time_table)
-
 
 def analyze_data(company_name, day_param_iterator, company_data_from_two_years):
 
