@@ -3,3 +3,5 @@ day_param,1
 two_year_span,20000
 one_year_span,10000
 online_mode,0
+auto_mode,0
+send_email,1

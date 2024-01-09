@@ -1,9 +1,14 @@
+# coding: utf8
+
 import csv
 import datetime
 import smtplib
 import ssl
 import time
 import datetime as dt
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 import pandas as pd
 from script.files import DBCursos
 from script.files import ImportNamesFromFile
@@ -29,10 +34,11 @@ curr_2year = []
 # day_param = 350 # - year
 #day_param = 1
 
-day_param = NumberOfDayMenu.days_choice()
-
 config_dict = ConfigFile.load_config()
 
+auto_mode = int(config_dict['auto_mode'])
+day_param = NumberOfDayMenu.days_choice(auto_mode)
+sendmail = int(config_dict['send_email'])
 online_mode = int(config_dict['online_mode'])
 
 if online_mode == 1:
@@ -68,8 +74,8 @@ def writeToFile(data):
         prefix = 'single_'
 
     dataString = str(datetime.date.today())
-    prefix = ''
-    dataString = ''
+    # prefix = ''
+    # dataString = ''
     filename = prefix + 'output' + dataString + '.csv'
 
     with open(filename, 'w', newline='') as csvfile:
@@ -83,7 +89,7 @@ def read_raports():
     # 0 - test 1 - full
     companies_list = ImportNamesFromFile.import_names_from_file(1)
     time_table = []
-
+    timeStart = datetime.datetime.now()
     for k in range(day_param):
         print(str(k) + " from " + str(day_param))
         time_start = time.time()
@@ -94,23 +100,35 @@ def read_raports():
             lower_list.clear()
             upper_list.clear()
             date_list.clear()
-            company_data_from_two_years = ImportDataFromFile.import_data_from_file(str(company[0]))
-            analyze_data(company[0], k, company_data_from_two_years)
+            company_data_from_two_years = ImportDataFromFile.import_data_from_file(str(company))
+            if k <= len(company_data_from_two_years):
+                analyze_data(company, k, company_data_from_two_years)
             time_comp_end = time.time()
             # print(time_comp_end - time_comp_start)
 
         print(str(round(100 * ((k + 1) / day_param), 3)) + '% Complete')
         if online_mode == 0:
             sortedOutputsArray = sorted(outputsArray, key=lambda x: x[-1])
+
+            payload = []
+            reducedList = []
             for output in sortedOutputsArray:
-                # if 'BUY2' in output or 'SELL' in output:
-                    print(output)
+                if 'BUY2' in output or 'SELL' in str(output):
+                    reducedList.append(output)
+            for record in reducedList:
+                print(record)
+            payload = reducedList
+            if sendmail == 1 and k <= 1:
+                sendingMail(payload)
+
             writeToFile(sortedOutputsArray)
         time_end = time.time()
 
         time_table.append(time_end - time_start)
 
     print(time_table)
+    timeEnd = datetime.datetime.now()
+    print("Done in : " + str(timeEnd-timeStart))
 
 def analyze_data(company_name, day_param_iterator, company_data_from_two_years):
 
@@ -379,5 +397,45 @@ def check_if_record_already_exist_2(date, company_name):
         return False
 
 
+def sendingMail(payload):
+    port = 465  # For SSL
+    smtp_server = "smtp.gazeta.pl"
+
+    emailCredentials = ConfigFile.load_password()
+
+    sender_email = emailCredentials[1]  # Enter your address
+    receiver_email = emailCredentials[2]  # Enter receiver address
+
+    messageStr = ""
+
+    message = MIMEMultipart("alternative")
+    message["Subject"] = "IMPORTANT STOCK UPDATE " + str(datetime.date.today())
+    message["From"] = sender_email
+    message["To"] = receiver_email
+
+    payload = editPayloadForEmail(payload)
+    for record in payload:
+        messageStr += "\n" + str(record)
+    if len(payload) > 0:
+
+        part1 = MIMEText(messageStr, "plain")
+        message.attach(part1)
+
+        context = ssl.create_default_context()
+        with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+            server.login(sender_email, emailCredentials[0])
+            server.sendmail(sender_email, receiver_email, message.as_string())
+
+def editPayloadForEmail(payload):
+
+    companies_list = ImportNamesFromFile.import_names_from_file(2)
+    editedPayload = []
+    for record in payload:
+        if ("SELL" in str(record) and record[1] in companies_list) or ("BUY" in str(record) and record[1] not in companies_list):
+            editedPayload.append(str(record[19]) + ' NOW ' + str(record[1]) + ' FOR PRICE ' + str(record[3]))
+
+    return editedPayload
+
 if __name__ == '__main__':
     main()
+
