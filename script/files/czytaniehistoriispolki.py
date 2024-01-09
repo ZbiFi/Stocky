@@ -403,7 +403,7 @@ def sendingMail(payload):
 
     emailCredentials = ConfigFile.load_password()
 
-    sender_email = emailCredentials[1]  # Enter your address
+    sender_email = emailCredentials[0]  # Enter your address
     receiver_email = emailCredentials[2]  # Enter receiver address
 
     messageStr = ""
@@ -423,7 +423,7 @@ def sendingMail(payload):
 
         context = ssl.create_default_context()
         with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-            server.login(sender_email, emailCredentials[0])
+            server.login(sender_email, emailCredentials[1])
             server.sendmail(sender_email, receiver_email, message.as_string())
 
 def editPayloadForEmail(payload):

@@ -18,12 +18,12 @@ def load_config():
 def load_password():
 
     credentials = []
-    filename = 'password.txt'
+    filename = 'password.txt' #create file and add in first line senderemail; password; targetemail
 
     with open(filename, 'r') as f:
         reader = csv.reader(f)
         for row in (list(reader)):
-            credentials = row[0]
+            credentials.append(row[0])
 
     #print (config_dict)
     return credentials
