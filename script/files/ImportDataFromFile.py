@@ -11,6 +11,7 @@ def import_data_from_file(company_name):
 
     selenium_url = config_dict['selenium_url']
     two_year_span = int(config_dict['two_year_span'])
+    offset = int(config_dict['offset'])
     super_data = []
     i = 0
 
@@ -25,11 +26,13 @@ def import_data_from_file(company_name):
             f.readline()
 
             for row in reversed(list(reader)):
-                if (int(today_string) - two_year_span) <= int(row[1]):
+                if (int(row[1]) >= int(today_string) - two_year_span - offset) and int(row[1]) <= (int(today_string) - offset):
                     super_data.append(row)
                     i += 1
-                else:
+                if (int(row[1]) < int(today_string) - two_year_span - offset):
                     break
+                else:
+                    continue
 
         # converting data to float
         for i in range(len(super_data)):

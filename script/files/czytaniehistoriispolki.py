@@ -90,6 +90,16 @@ def read_raports():
     companies_list = ImportNamesFromFile.import_names_from_file(1)
     time_table = []
     timeStart = datetime.datetime.now()
+
+    two_year_span = int(config_dict['two_year_span'])
+    offset = int(config_dict['offset'])
+    today_string = str(dt.datetime.now().date()).replace("-", "")
+
+    analysisFrom = int(today_string) - two_year_span - offset
+    analysisTo= int(today_string) - offset
+
+    print(f'Analysis from {analysisFrom} to {analysisTo}')
+
     for k in range(day_param):
         print(str(k) + " from " + str(day_param))
         time_start = time.time()
@@ -115,10 +125,10 @@ def read_raports():
             for output in sortedOutputsArray:
                 if 'BUY2' in output or 'SELL' in str(output):
                     reducedList.append(output)
-            for record in reducedList:
-                print(record)
-            payload = reducedList
             if sendmail == 1 and k <= 1:
+                payload = reducedList
+                for record in reducedList:
+                    print(record)
                 sendingMail(payload)
 
             writeToFile(sortedOutputsArray)
@@ -180,7 +190,7 @@ def analyze_data(company_name, day_param_iterator, company_data_from_two_years):
         lets_say_current_list.append(data_list[0])
         for k in range(buffor_day_range):
             if float(data_list[len(data_list)-1-k]) > float(temp_max_value):
-                temp_max_value = float(data_list[len(data_list)-1-k])
+                 temp_max_value = float(data_list[len(data_list)-1-k])
         max_value.append(temp_max_value)
         data_list.clear()
         time_j_end = time.time()
