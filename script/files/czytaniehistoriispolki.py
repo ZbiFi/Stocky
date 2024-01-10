@@ -416,34 +416,36 @@ def sendingMail(payload):
     emailCredentials = ConfigFile.load_password()
 
     sender_email = emailCredentials[0]  # Enter your address
-    receiver_email = emailCredentials[2]  # Enter receiver address
+    sender_password = emailCredentials[1]
 
-    messageStr = ""
+    emailWithCompanies = ImportNamesFromFile.import_email_and_companies()
+    for mailWithCompany in emailWithCompanies:
+        receiver_email = mailWithCompany[:1][0]  # Enter receiver address
 
-    message = MIMEMultipart("alternative")
-    message["Subject"] = "IMPORTANT STOCK UPDATE " + str(datetime.date.today())
-    message["From"] = sender_email
-    message["To"] = receiver_email
+        messageStr = ""
 
-    payload = editPayloadForEmail(payload)
-    for record in payload:
-        messageStr += "\n" + str(record)
-    if len(payload) > 0:
+        message = MIMEMultipart("alternative")
+        message["Subject"] = "IMPORTANT STOCK UPDATE " + str(datetime.date.today())
+        message["From"] = sender_email
+        message["To"] = receiver_email
+        editedPayload = editPayloadForEmail(payload, mailWithCompany[1:])
+        for record in editedPayload:
+            messageStr += "\n" + str(record)
+        if len(editedPayload) > 0:
 
-        part1 = MIMEText(messageStr, "plain")
-        message.attach(part1)
+            part1 = MIMEText(messageStr, "plain")
+            message.attach(part1)
 
-        context = ssl.create_default_context()
-        with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-            server.login(sender_email, emailCredentials[1])
-            server.sendmail(sender_email, receiver_email, message.as_string())
+            context = ssl.create_default_context()
+            with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+                server.login(sender_email, sender_password)
+                server.sendmail(sender_email, receiver_email, message.as_string())
 
-def editPayloadForEmail(payload):
+def editPayloadForEmail(payload, companies):
 
-    companies_list = ImportNamesFromFile.import_names_from_file(2)
     editedPayload = []
     for record in payload:
-        if ("SELL" in str(record) and record[1] in companies_list) or ("BUY" in str(record) and record[1] not in companies_list):
+        if ("SELL" in str(record) and record[1] in str(companies)) or ("BUY" in str(record) and record[1] not in str(companies)):
             editedPayload.append(str(record[19]) + ' NOW ' + str(record[1]) + ' FOR PRICE ' + str(record[3]))
 
     return editedPayload

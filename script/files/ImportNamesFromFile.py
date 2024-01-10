@@ -22,3 +22,14 @@ def import_names_from_file(import_type):
 
     # print (companies_list)
     return companies_list
+
+def import_email_and_companies():
+
+    data_list = []
+    filename = 'companies_owned.txt'
+
+    with open(filename, 'r') as f:
+        reader = csv.reader(f)
+        for row in (list(reader)):
+            data_list.append(row)
+    return data_list
