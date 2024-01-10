@@ -167,7 +167,7 @@ def analyzePast(conditionBuyValue= 3, conditionSellValue=3, manual= True):
             else:
                 print(f'{i} BOUGHT {[pair[0][0], pair[0][1], pair[0][2], pair[0][3]]} SOLD {[pair[1][0], pair[1][1], pair[1][2], pair[1][3]]}')
             profit = round((float(pair[1][3]) / float(pair[0][3]) * 100), 2)
-            print(f'{i} {profit}')
+            print(f'{i} profit  {profit}')
 
         print()
         for pair in pairWithLastKnownValue:
@@ -177,9 +177,9 @@ def analyzePast(conditionBuyValue= 3, conditionSellValue=3, manual= True):
             else:
                 print(f'{i} BOUGHT {[pair[0][0], pair[0][1], pair[0][2], pair[0][3]]} ON HOLD {[pair[1][0], pair[1][1], pair[1][2], pair[1][3]]}')
             profit = round((float(pair[1][3]) / float(pair[0][3]) * 100), 2)
-            print(f'{i} {profit}')
+            print(f'{i} profit/loss  {profit}')
 
     return [conditionBuyValue, conditionSellValue, efficiencyReturnValue, avarageProfitReturnValue, avarageChangeForValueForOpen, pairFound, pairWithLastKnownValue]
 
-# analyzePast(2,0)
-findBestOptions()
+analyzePast(2,0)
+# findBestOptions()

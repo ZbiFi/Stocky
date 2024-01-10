@@ -91,15 +91,6 @@ def read_raports():
     time_table = []
     timeStart = datetime.datetime.now()
 
-    two_year_span = int(config_dict['two_year_span'])
-    offset = int(config_dict['offset'])
-    today_string = str(dt.datetime.now().date()).replace("-", "")
-
-    analysisFrom = int(today_string) - two_year_span - offset
-    analysisTo= int(today_string) - offset
-
-    print(f'Analysis from {analysisFrom} to {analysisTo}')
-
     for k in range(day_param):
         print(str(k) + " from " + str(day_param))
         time_start = time.time()
@@ -125,11 +116,12 @@ def read_raports():
             for output in sortedOutputsArray:
                 if 'BUY2' in output or 'SELL' in str(output):
                     reducedList.append(output)
-            if sendmail == 1 and k <= 1:
-                payload = reducedList
+            if k <= 1:
                 for record in reducedList:
                     print(record)
-                sendingMail(payload)
+                if sendmail == 1:
+                    payload = reducedList
+                    sendingMail(payload)
 
             writeToFile(sortedOutputsArray)
         time_end = time.time()
@@ -364,6 +356,16 @@ def main():
     global last_oid, last_id, max_value
     if online_mode == 1:
         last_oid, last_id = select_last_from_mysql_db("raport")
+
+    two_year_span = int(config_dict['two_year_span'])
+    one_year_span = int(config_dict['one_year_span'])
+    offset = int(config_dict['offset'])
+    today_string = str(dt.datetime.now().date()).replace("-", "")
+
+    analysisFrom = int(today_string) - one_year_span - offset
+    analysisTo= int(today_string) - offset
+
+    print(f'Analysis from {analysisFrom} to {analysisTo}')
 
     max_value = []
     read_raports()
