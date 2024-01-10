@@ -10,13 +10,13 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 import pandas as pd
-from script.files import DBCursos
-from script.files import ImportNamesFromFile
-from script.files import ImportDataFromFile
-from script.files import NumberOfDayMenu
-from script.files import DaysInYear
-from script.files import ConfigFile
-from script.files import SQLDICT
+import DBCursos
+import ImportNamesFromFile
+import ImportDataFromFile
+import NumberOfDayMenu
+import DaysInYear
+import ConfigFile
+import SQLDICT
 
 today = dt.datetime.now().date()
 todayStr = str(today)

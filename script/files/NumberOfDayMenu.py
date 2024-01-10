@@ -1,13 +1,4 @@
-import msvcrt
-import signal
-import sys
-import time
-
-from pytimedinput import timedInput
-
-from script.files import ConfigFile
-
-
+import ConfigFile
 
 def days_choice(auto=0):
 

@@ -1,5 +1,5 @@
 import datetime as dt
-from script.files import ConfigFile
+import ConfigFile
 
 
 def daysInYear(super_data):

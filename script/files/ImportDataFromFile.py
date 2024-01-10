@@ -1,6 +1,6 @@
 import datetime as dt
 import csv
-from script.files import ConfigFile
+import ConfigFile
 from os.path import exists
 
 

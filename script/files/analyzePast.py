@@ -1,6 +1,6 @@
 from numpy import mean
 
-from script.files import ImportNamesFromFile, LoadArchiveDataFromFile
+from script.files import LoadArchiveDataFromFile
 import datetime as dt
 
 def conditions(isBuy, conditionBuy, conditionSell, data):
