@@ -17,7 +17,10 @@ def conditions(isBuy, conditionBuy, conditionSell, data):
                 if data == 'BUY2':
                     return True
             case 3:
-                if data == 'BUY1' or data == 'BUY2' or data == 'BUY':
+                if data == 'BUY3':
+                    return True
+            case 4:
+                if data == 'BUY1' or data == 'BUY2' or data == 'BUY3' or data == 'BUY':
                     return True
             case _:
                 return False
@@ -34,7 +37,10 @@ def conditions(isBuy, conditionBuy, conditionSell, data):
                 if data == 'SELL2':
                     return True
             case 3:
-                if data == 'SELL1' or data == 'SELL2' or data == 'SELL':
+                if data == 'SELL3':
+                    return True
+            case 4:
+                if data == 'SELL1' or data == 'SELL2' or data== 'SELL3' or data == 'SELL':
                     return True
             case _:
                 return False
@@ -43,8 +49,8 @@ def conditions(isBuy, conditionBuy, conditionSell, data):
 def findBestOptions():
 
     returnedROIValues = []
-    for i in range(4):
-        for j in range(4):
+    for i in range(5):
+        for j in range(5):
             part1 = round(analyzePast(i, j, False)[2]/100, 2)
             part2 = 1+round(analyzePast(i, j, False)[3]/100, 2)
             part3 = 1-round(analyzePast(i, j, False)[2]/100, 2)
@@ -76,7 +82,7 @@ def findBestOptions():
     print(f'EFFICIENCY to miara ile tranzakcji zostało zamkniętych w ostatnim roku (wymagana para buy and sell) do ilości trakzakcji kupna, co nie zostało zamknięte ląduje w OPEN TRANS')
     return
 
-def analyzePast(conditionBuyValue= 3, conditionSellValue=3, manual= True):
+def analyzePast(conditionBuyValue= 4, conditionSellValue=4, manual= True):
 
     #CONDITION FOR EFFIENCY ANALYSE  <0;3> lower value for restrictive
 
@@ -181,5 +187,5 @@ def analyzePast(conditionBuyValue= 3, conditionSellValue=3, manual= True):
 
     return [conditionBuyValue, conditionSellValue, efficiencyReturnValue, avarageProfitReturnValue, avarageChangeForValueForOpen, pairFound, pairWithLastKnownValue]
 
-analyzePast(2,0)
-# findBestOptions()
+# analyzePast(3,0)
+findBestOptions()

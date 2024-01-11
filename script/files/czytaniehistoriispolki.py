@@ -30,6 +30,9 @@ lets_say_current_list = []
 outputsArray = []
 date_list = []
 curr_2year = []
+lower_quartile = 0.33
+higher_quartile = 0.66
+quartile_test = False
 # companies_list = []
 # day_param = 350 # - year
 #day_param = 1
@@ -70,6 +73,8 @@ def writeToFile(data):
 
     if day_param > 1:
         prefix = str(day_param) + '_multi_'
+    if quartile_test:
+        prefix = str(lower_quartile) + str(higher_quartile) + '_'
     else:
         prefix = 'single_'
 
@@ -114,11 +119,12 @@ def read_raports():
             payload = []
             reducedList = []
             for output in sortedOutputsArray:
-                if 'BUY2' in output or 'SELL' in str(output):
+                if ('BUY3' in output or 'SELL' in str(output)):
                     reducedList.append(output)
             if k <= 1:
                 for record in reducedList:
                     print(record)
+                    # print(str(float(record[17])/float(record[15])))
                 if sendmail == 1:
                     payload = reducedList
                     sendingMail(payload)
@@ -176,8 +182,8 @@ def analyze_data(company_name, day_param_iterator, company_data_from_two_years):
 
         temp_max_value = 0
         df = pd.DataFrame(data_list)
-        lower_list.append(df.quantile(0.33).values.min())
-        upper_list.append(df.quantile(0.66).values.min())
+        lower_list.append(df.quantile(lower_quartile).values.min())
+        upper_list.append(df.quantile(higher_quartile).values.min())
         date_list.append(int(company_data_from_two_years[j][1]))  # !!!!!!wrzucic do petli for i->powinno dzialac
         lets_say_current_list.append(data_list[0])
         for k in range(buffor_day_range):
@@ -302,7 +308,11 @@ def analyze_price_channel(output):
             else:
                 # Cena spadla pod kanal cenonwy
                 # print("Starts being cheap - think about buying")
-                text = "BUY2"
+                # if spread in channel price > 10%
+                if float(output[17]) / float(output[15]) >= 1.10:
+                    text = "BUY3"
+                else:
+                    text = "BUY2"
         # print(output)
         output.append(text)
         # print(output)
@@ -340,7 +350,11 @@ def analyze_price_channel(output):
             else:
                 # cena spadla o wiecej niz 10% od szczytu w ostatnich dniach( <10 ergo. szybko),ale wciaz jest droga
                 # print("Expensive but far from heaven - think of selling")
-                text = "SELL2"
+                # if spread in channel price > 10%
+                if float(output[17]) / float(output[15]) >= 1.10:
+                    text = "SELL3"
+                else:
+                    text = "SELL2"
         output.append(text)
     elif (output[5] == "upper") and (float(output[3]) <= float(output[18])):
         # Cena odbija ale jest ryzyko ze sell w stosunku do buya bedzie na -
@@ -368,6 +382,32 @@ def main():
     print(f'Analysis from {analysisFrom} to {analysisTo}')
 
     max_value = []
+    # global lower_quartile
+    # global higher_quartile
+    # for i in range(7):
+    #     match i:
+    #         case 0:
+    #             lower_quartile = 0.40
+    #             higher_quartile = 0.60
+    #         case 1:
+    #             lower_quartile = 0.35
+    #             higher_quartile = 0.65
+    #         case 2:
+    #             lower_quartile = 0.33
+    #             higher_quartile = 0.66
+    #         case 3:
+    #             lower_quartile = 0.30
+    #             higher_quartile = 0.70
+    #         case 4:
+    #             lower_quartile = 0.25
+    #             higher_quartile = 0.75
+    #         case 5:
+    #             lower_quartile = 0.20
+    #             higher_quartile = 0.80
+    #         case 6:
+    #             lower_quartile = 0.15
+    #             higher_quartile = 0.85
+
     read_raports()
 
 
