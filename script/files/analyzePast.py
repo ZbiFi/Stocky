@@ -40,7 +40,7 @@ def conditions(isBuy, conditionBuy, conditionSell, data):
                 if data == 'SELL3':
                     return True
             case 4:
-                if data == 'SELL1' or data == 'SELL2' or data== 'SELL3' or data == 'SELL':
+                if data == 'SELL1' or data == 'SELL2' or data == 'SELL3' or data == 'SELL':
                     return True
             case _:
                 return False
@@ -140,10 +140,18 @@ def analyzePast(conditionBuyValue= 4, conditionSellValue=4, manual= True):
         profit = round((float(pair[1][3]) / float(pair[0][3]) * 100), 2)
         restOpenList.append(profit)
     # print(restOpenList)
-
-    efficiencyReturnValue = round((len(pairFound) / buySignal) * 100, 2)
-    avarageProfitReturnValue = round(float(mean(profitsList)), 2)
-    avarageChangeForValueForOpen = round(float(mean(restOpenList)), 2)
+    if buySignal > 0:
+        efficiencyReturnValue = round((len(pairFound) / buySignal) * 100, 2)
+    else:
+        efficiencyReturnValue = 0
+    if len(profitsList) > 0:
+        avarageProfitReturnValue = round(float(mean(profitsList)), 2)
+    else:
+        avarageProfitReturnValue = 0
+    if len(restOpenList) > 0:
+        avarageChangeForValueForOpen = round(float(mean(restOpenList)), 2)
+    else:
+        avarageChangeForValueForOpen = 0
 
     part1 = round(efficiencyReturnValue / 100, 2)
     part2 = 1 + round(avarageProfitReturnValue / 100, 2)
@@ -187,5 +195,5 @@ def analyzePast(conditionBuyValue= 4, conditionSellValue=4, manual= True):
 
     return [conditionBuyValue, conditionSellValue, efficiencyReturnValue, avarageProfitReturnValue, avarageChangeForValueForOpen, pairFound, pairWithLastKnownValue]
 
-# analyzePast(3,0)
+# analyzePast(3,2)
 findBestOptions()

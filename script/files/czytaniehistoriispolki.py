@@ -70,13 +70,14 @@ def select_last_from_mysql_db(table_name):
         return myresult[0]
     
 def writeToFile(data):
-
+    prefix = ''
     if day_param > 1:
-        prefix = str(day_param) + '_multi_'
-    if quartile_test:
-        prefix = str(lower_quartile) + str(higher_quartile) + '_'
+        prefix += str(day_param) + '_multi_'
     else:
-        prefix = 'single_'
+        prefix += 'single_'
+    if quartile_test:
+        prefix += str(lower_quartile) + str(higher_quartile) + '_'
+
 
     dataString = str(datetime.date.today())
     # prefix = ''
@@ -336,6 +337,8 @@ def analyze_price_channel(output):
             
                 # print("Starting to decline - last moment for selling")
                 text = "Late Selling"
+        else:
+            text = "No change"
         output.append(text)
     if (output[5] == "upper") and (float(output[3]) > float(output[18])):
         if float(output[3]) / float(output[11]) > float(0.9):
