@@ -90,7 +90,7 @@ def writeToFile(data):
             row = [str(singleRow).replace('[', '').replace(']', '').replace(',', '|').replace('\'', '').replace('| ', '|').replace('.', ',')]
             spamwriter.writerow(singleRow)
 
-def read_raports():
+def read_stock_raports():
 
     # 0 - test 1 - full
     companies_list = ImportNamesFromFile.import_names_from_file(1)
@@ -411,7 +411,7 @@ def main():
     #             lower_quartile = 0.15
     #             higher_quartile = 0.85
 
-    read_raports()
+    read_stock_raports()
 
 
 def insert_into_mysql_db(last_oid_param, last_id_param, output):
