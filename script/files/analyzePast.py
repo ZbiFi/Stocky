@@ -162,7 +162,7 @@ def analyzePast(conditionBuyValue= 4, conditionSellValue=4, manual= True):
 
     if manual:
 
-        full = not False
+        full = not True
 
         print('Buy signals: ' + str(buySignal))
         print('Pairs found: ' + str(len(pairFound)))
@@ -174,26 +174,28 @@ def analyzePast(conditionBuyValue= 4, conditionSellValue=4, manual= True):
         print('Profit/Loss: ' + str(profilorLoss))
 
         i=0
+        print(f'SUCCESSFUL pairs (CLOSED)')
         for pair in pairFound:
             i+=1
+            profit = round((float(pair[1][3]) / float(pair[0][3]) * 100), 2)
             if full:
                 print(f'{i} {pair}')
+                print(f'{i} profit/loss {profit}')
             else:
-                print(f'{i} BOUGHT {[pair[0][0], pair[0][1], pair[0][2], pair[0][3]]} SOLD {[pair[1][0], pair[1][1], pair[1][2], pair[1][3]]}')
-            profit = round((float(pair[1][3]) / float(pair[0][3]) * 100), 2)
-            print(f'{i} profit  {profit}')
+                print(f'{i} {pair[0][1]} B: {[pair[0][0],pair[0][2], pair[0][3]]} S: {[pair[1][0], pair[1][2], pair[1][3]]} Profit/Loss {profit}')
 
         print()
+        print(f'LEFTOVER pair (OPEN)')
         for pair in pairWithLastKnownValue:
             i += 1
+            profit = round((float(pair[1][3]) / float(pair[0][3]) * 100), 2)
             if full:
                 print(f'{i} {pair}')
+                print(f'{i} profit/loss {profit}')
             else:
-                print(f'{i} BOUGHT {[pair[0][0], pair[0][1], pair[0][2], pair[0][3]]} ON HOLD {[pair[1][0], pair[1][1], pair[1][2], pair[1][3]]}')
-            profit = round((float(pair[1][3]) / float(pair[0][3]) * 100), 2)
-            print(f'{i} profit/loss  {profit}')
+                print(f'{i} {pair[0][1]} B: {[pair[0][0],pair[0][2], pair[0][3]]} S: {[pair[1][0], pair[1][2], pair[1][3]]} Profit/Loss {profit}')
 
     return [conditionBuyValue, conditionSellValue, efficiencyReturnValue, avarageProfitReturnValue, avarageChangeForValueForOpen, pairFound, pairWithLastKnownValue]
 
-# analyzePast(3,2)
-findBestOptions()
+analyzePast(3,0)
+# findBestOptions()
