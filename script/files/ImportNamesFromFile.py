@@ -13,7 +13,7 @@ def import_names_from_file(import_type):
         filename = 'companies.txt'
     # owned for emails
     if import_type == 2:
-        filename = 'companies_owned.txt'
+        filename = 'companies_newconnect.txt'
 
     with open(filename, 'r') as f:
         reader = csv.reader(f)

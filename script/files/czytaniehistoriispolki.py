@@ -80,7 +80,7 @@ def writeToFile(data):
 
 
 def read_stock_raports():
-    # 0 - test 1 - full
+    # 0 - test 1 - GPW 2 - NewConnect
     companies_list = ImportNamesFromFile.import_names_from_file(1)
     time_table = []
     timeStart = datetime.datetime.now()
