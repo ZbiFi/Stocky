@@ -16,6 +16,8 @@ import ImportDataFromFile
 import NumberOfDayMenu
 import DaysInYear
 import ConfigFile
+import SQLClass
+import buySellSignalAnalysis
 import SQLDICT
 
 today = dt.datetime.now().date()
@@ -46,6 +48,7 @@ online_mode = int(config_dict['online_mode'])
 
 if online_mode == 1:
     mydb, mycursor, database_param = DBCursos.main()
+    sqlClass = SQLClass.SQLClass(mydb, mycursor, database_param)
 else:
     mydb, mycursor, database_param = 0, 0, 0
 
@@ -57,18 +60,6 @@ last_oid = -1
 # mycursor.execute(querry)
 # print(mycursor.fetchall())
 
-
-def select_last_from_mysql_db(table_name):
-
-    sql = "select " + "max(" + table_name + "_oid)" + "," + "max(" + table_name + "_id)" + " from " + database_param + "." + table_name
-    mycursor.execute(sql)
-    myresult = mycursor.fetchall()
-    temp1, temp2 = myresult[0]
-    if str(temp1) == "None":
-        return -1, 0
-    else:
-        return myresult[0]
-    
 def writeToFile(data):
     prefix = ''
     if day_param > 1:
@@ -132,8 +123,9 @@ def read_stock_raports():
 
             writeToFile(sortedOutputsArray)
         time_end = time.time()
-
-        time_table.append(time_end - time_start)
+        time_passed = time_end - time_start
+        print(f'Time {time_passed}')
+        time_table.append(time_passed)
 
     print(time_table)
     timeEnd = datetime.datetime.now()
@@ -274,105 +266,22 @@ def analyze_data(company_name, day_param_iterator, company_data_from_two_years):
             output = [date_list[temp_value_for_i], company_name, "Current Value:", lets_say_current_list[temp_value_for_i], "Current status", current_status, "Previous status", previous_status, "Streak", progression, low_max_text, low_max_value, special_text, special_value, "Lower Price Channel", lower_list[temp_value_for_i], "Upper Price Channel", upper_list[temp_value_for_i], max_value[day_param_iterator]]
             # analyze_price_channel(output)
             if online_mode == 1:
-                if check_if_record_already_exist(output):
+                if sqlClass.check_if_record_already_exist(output):
                     print("RECORD ALREADY EXISTS:" + str(output))
                 else:
                     global last_oid, last_id
-                    insert_into_mysql_db(last_oid, last_id, output)
-                    last_oid, last_id = select_last_from_mysql_db("raport")
+                    sqlClass.insert_into_mysql_db(last_oid, last_id, output)
+                    last_oid, last_id = sqlClass.select_last_from_mysql_db("raport")
             else:
-                analyze_price_channel(output)
+                buySellSignalAnalysis.analyze_price_channel(output)
                 outputsArray.append(output)
-
-# NOT USED RIGHT NOW
-def analyze_price_channel(output):
-
-    text = ""
-
-    # [5] status        [11] prct special value (min/max etc)
-    if output[5] == "low":
-        if float(output[3]) / float(output[11]) > float(1.10):
-            # Cena ponad 10% od dołka(pod kanalem cenonwym)
-            # print("Start of rising - BUY")
-            # text = "Start of slowly rising - BUY"
-            text = "BUY"
-        # elif ((float(output[3])/float(output[11])>float(1.10)):
-        # text = "Heavy spike up - risky BUY"
-            # print("aaaaaaaaaaaa")
-                                                                    
-        else:
-            if int(output[9] > int(10)):
-                # Cena jest blisko dołka przez ponad 10 dni (pod kanalem cenonwym)
-                # print("Lies deep beneath the ocean - time to buy")
-                # text ="Lies deep beneath the ocean - time to buy"
-                text = "BUY1"
-            else:
-                # Cena spadla pod kanal cenonwy
-                # print("Starts being cheap - think about buying")
-                # if spread in channel price > 10%
-                if float(output[17]) / float(output[15]) >= 1.10:
-                    text = "BUY3"
-                else:
-                    text = "BUY2"
-        # print(output)
-        output.append(text)
-        # print(output)
-    if output[5] == "in":
-        if output[7] == "low":
-            if float(output[13]) < float(1):
-                # Cena wskoczyła w kanał z dołka
-                # print("Rised above the bottom line - last moment for buying")
-                text = "Late Buying"
-            else:
-                # Cena jest ponad średnią, ale w kanale - dom. rośnie bo wyszła z dołka
-                # print("Stable and going up - should be expensive soon")
-                text = "Close to Sell"
-        if output[7] == "upper":
-            if float(output[13]) < float(1):
-                # Cena jest w kanale - ale spada poniżej średniej - dom. była wczesniej nad kanałek
-                # print("Going down - should be cheap soon")
-                text = "Close to Buy"
-            else:
-                # Cena spadła do kanału z gorki
-            
-                # print("Starting to decline - last moment for selling")
-                text = "Late Selling"
-        else:
-            text = "No change"
-        output.append(text)
-    if (output[5] == "upper") and (float(output[3]) > float(output[18])):
-        if float(output[3]) / float(output[11]) > float(0.9):
-            # Cena buduje szczyt - jestes w topie lub w 10% odleglosci od niego
-            # print("Making summit - SELL!")
-            text = "SELL"
-        else:
-            if int(output[9] > int(10)):
-                # cena zrobila szczyt i utrzymuje wartosc wieksza niz 10% od szczytu ale wciaz jest droga
-                # print("Goind down - time to sell")
-                text = "SELL1"
-            else:
-                # cena spadla o wiecej niz 10% od szczytu w ostatnich dniach( <10 ergo. szybko),ale wciaz jest droga
-                # print("Expensive but far from heaven - think of selling")
-                # if spread in channel price > 10%
-                if float(output[17]) / float(output[15]) >= 1.10:
-                    text = "SELL3"
-                else:
-                    text = "SELL2"
-        output.append(text)
-    elif (output[5] == "upper") and (float(output[3]) <= float(output[18])):
-        # Cena odbija ale jest ryzyko ze sell w stosunku do buya bedzie na -
-        # text = "Starting to rise - risky Buy"
-        text = "Selling not adviced - possible High Buying Price"
-        output.append(text)
-    # print("")
-    return
 
 
 def main():
 
     global last_oid, last_id, max_value
     if online_mode == 1:
-        last_oid, last_id = select_last_from_mysql_db("raport")
+        last_oid, last_id = sqlClass.select_last_from_mysql_db("raport")
 
     two_year_span = int(config_dict['two_year_span'])
     one_year_span = int(config_dict['one_year_span'])
@@ -412,45 +321,6 @@ def main():
     #             higher_quartile = 0.85
 
     read_stock_raports()
-
-
-def insert_into_mysql_db(last_oid_param, last_id_param, output):
-
-    temp_oid = last_oid_param+1
-    temp_id = last_id_param+1
-    sql = "INSERT INTO raport (raport_oid, raport_id, date, company_name, current_value, current_status,previous_status,Streak,special_value,Perct_special_value,bottom_price_channel, upper_price_channel, max_value) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-    # val = (temp_oid,temp_id,"20190205","Hydrotor","20","low","in","5","15","20","50","100")
-
-    val = (temp_oid, temp_id, output[0], output[1], output[3], output[5], output[7], output[9], output[11], output[13], output[15], output[17], output[18])
-    mycursor.execute(sql, val)
-    mydb.commit()
-
-
-def check_if_record_already_exist(output):
-
-    table_name = "raport"
-    # sql = "select *" + " from " + "apkadb."+table_name + " where date" +"='" +str(output[0]) +"' and company_name"+ "='" + str(output[1]+"'")
-    sql = "select *" + " from " + database_param + "." + table_name + " where date" + "='" + str(output[0]) + "' and company_name" + "='" + str(output[1] + "'")
-    mycursor.execute(sql)
-    myresult = mycursor.fetchall()
-
-    if len(myresult) > 0:
-        return True
-    else:
-        return False
-
-
-def check_if_record_already_exist_2(date, company_name):
-
-    table_name = "raport"
-    sql = "select *" + " from " + database_param + "." + table_name + " where date" + "='" + str(date) + "' and company_name" + "='" + str(company_name) + "'"
-    mycursor.execute(sql)
-    myresult = mycursor.fetchall()
-    if len(myresult) > 0:
-        return True
-    else:
-        return False
-
 
 def sendingMail(payload):
     port = 465  # For SSL
