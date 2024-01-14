@@ -24,11 +24,8 @@ today = dt.datetime.now().date()
 todayStr = str(today)
 todayStr2 = todayStr.replace("-", "")
 
-
-data_list = []
 lower_list = []
 upper_list = []
-lets_say_current_list = []
 outputsArray = []
 date_list = []
 curr_2year = []
@@ -37,7 +34,7 @@ higher_quartile = 0.66
 quartile_test = False
 # companies_list = []
 # day_param = 350 # - year
-#day_param = 1
+# day_param = 1
 
 config_dict = ConfigFile.load_config()
 
@@ -55,6 +52,7 @@ else:
 last_id = -1
 last_oid = -1
 
+
 # sql_data = SQLDICT.getdict()
 # querry = sql_data['maxoids']
 # mycursor.execute(querry)
@@ -69,7 +67,6 @@ def writeToFile(data):
     if quartile_test:
         prefix += str(lower_quartile) + str(higher_quartile) + '_'
 
-
     dataString = str(datetime.date.today())
     # prefix = ''
     # dataString = ''
@@ -81,8 +78,8 @@ def writeToFile(data):
             row = [str(singleRow).replace('[', '').replace(']', '').replace(',', '|').replace('\'', '').replace('| ', '|').replace('.', ',')]
             spamwriter.writerow(singleRow)
 
-def read_stock_raports():
 
+def read_stock_raports():
     # 0 - test 1 - full
     companies_list = ImportNamesFromFile.import_names_from_file(1)
     time_table = []
@@ -94,7 +91,6 @@ def read_stock_raports():
         for company in companies_list:
 
             time_comp_start = time.time()
-            data_list.clear()
             lower_list.clear()
             upper_list.clear()
             date_list.clear()
@@ -129,10 +125,10 @@ def read_stock_raports():
 
     print(time_table)
     timeEnd = datetime.datetime.now()
-    print("Done in : " + str(timeEnd-timeStart))
+    print("Done in : " + str(timeEnd - timeStart))
+
 
 def analyze_data(company_name, day_param_iterator, company_data_from_two_years):
-
     time_lapse = 10000
     global max_value
     days_in_year = 0
@@ -153,8 +149,9 @@ def analyze_data(company_name, day_param_iterator, company_data_from_two_years):
     temp_value_for_i = 0
     max_value.clear()
     progression = 0
-    # skip = False
 
+    data_list = []
+    # skip = False
     days_in_year = DaysInYear.daysInYear(company_data_from_two_years)
     # for i in range(len(super_data)):
     #    if(int(todayStr2)-time_lapse) > int(super_data[i][1]):
@@ -166,10 +163,12 @@ def analyze_data(company_name, day_param_iterator, company_data_from_two_years):
     timeJ = []
     for j in range(days_in_year):
         time_j_start = time.time()
-        temp_var = days_in_year+j
+        temp_var = days_in_year + j
 
         for i in range(j, temp_var):  # loop for creating data_list - list of company value in 1 y window offset by j (for 2 years span analysis)
-            if i == len(company_data_from_two_years)-1:
+
+            # if when company_data is shorter (example when not every day trading is available or something else
+            if i == len(company_data_from_two_years) - 1:
                 break
             data_list.append(company_data_from_two_years[i][5])
 
@@ -180,15 +179,15 @@ def analyze_data(company_name, day_param_iterator, company_data_from_two_years):
         date_list.append(int(company_data_from_two_years[j][1]))  # !!!!!!wrzucic do petli for i->powinno dzialac
         lets_say_current_list.append(data_list[0])
         for k in range(buffor_day_range):
-            if float(data_list[len(data_list)-1-k]) > float(temp_max_value):
-                 temp_max_value = float(data_list[len(data_list)-1-k])
+            if float(data_list[len(data_list) - 1 - k]) > float(temp_max_value):
+                temp_max_value = float(data_list[len(data_list) - 1 - k])
         max_value.append(temp_max_value)
         data_list.clear()
         time_j_end = time.time()
         # print(f'TimeJ: ' + str(time_j_end-time_j_start))
         timeJ.append(time_j_end - time_j_start)
 
-    if len(lets_say_current_list)>0:
+    if len(lets_say_current_list) > 0:
         highest = max(lets_say_current_list)
         lowest = min(lets_say_current_list)
     else:
@@ -208,24 +207,24 @@ def analyze_data(company_name, day_param_iterator, company_data_from_two_years):
             if float(lets_say_current_list[i]) < float(lower_list[i]):
 
                 special_text = "Perct to bottom price channel"
-                special_value = "{0:.2f}".format(100-(float(lets_say_current_list[i])/float(lower_list[i])*100))
+                special_value = "{0:.2f}".format(100 - (float(lets_say_current_list[i]) / float(lower_list[i]) * 100))
                 low_max_text = "Min Value"
                 low_max_value = lowest
                 current_status = "low"
-                statuses.append("low")            
+                statuses.append("low")
                 if last_status != current_status:
                     progression = 1
                     previous_status = last_status
                     last_status = current_status
-                    
+
                 else:
                     progression += 1
- 
+
             elif float(lets_say_current_list[i]) >= float(lower_list[i]) and (float(lets_say_current_list[i]) <= float(upper_list[i])):
 
                 special_text = "Perct from avg channel price"
-                avg = ((float(upper_list[i])+float(lower_list[i]))/2)
-                special_value = "{0:.2f}".format(float(lets_say_current_list[i])/avg)
+                avg = ((float(upper_list[i]) + float(lower_list[i])) / 2)
+                special_value = "{0:.2f}".format(float(lets_say_current_list[i]) / avg)
                 low_max_text = "Average channel price:"
                 low_max_value = avg
                 current_status = "in"
@@ -240,7 +239,7 @@ def analyze_data(company_name, day_param_iterator, company_data_from_two_years):
             elif float(lets_say_current_list[i]) > float(upper_list[i]):
 
                 special_text = "Perct over top price channel"
-                special_value = "{0:.2f}".format(((float(lets_say_current_list[i])/float(upper_list[i])*100)-100))
+                special_value = "{0:.2f}".format(((float(lets_say_current_list[i]) / float(upper_list[i]) * 100) - 100))
                 low_max_text = "Max value"
                 low_max_value = highest
                 current_status = "upper"
@@ -254,7 +253,7 @@ def analyze_data(company_name, day_param_iterator, company_data_from_two_years):
 
             if previous_status == "":
                 previous_status = current_status
-        
+
             temp_value_for_i = i
 
         # time_end = time.time()
@@ -278,7 +277,6 @@ def analyze_data(company_name, day_param_iterator, company_data_from_two_years):
 
 
 def main():
-
     global last_oid, last_id, max_value
     if online_mode == 1:
         last_oid, last_id = sqlClass.select_last_from_mysql_db("raport")
@@ -289,7 +287,7 @@ def main():
     today_string = str(dt.datetime.now().date()).replace("-", "")
 
     analysisFrom = int(today_string) - one_year_span - offset
-    analysisTo= int(today_string) - offset
+    analysisTo = int(today_string) - offset
 
     print(f'Analysis from {analysisFrom} to {analysisTo}')
 
@@ -322,6 +320,7 @@ def main():
 
     read_stock_raports()
 
+
 def sendingMail(payload):
     port = 465  # For SSL
     smtp_server = "smtp.gazeta.pl"
@@ -345,7 +344,6 @@ def sendingMail(payload):
         for record in editedPayload:
             messageStr += "\n" + str(record)
         if len(editedPayload) > 0:
-
             part1 = MIMEText(messageStr, "plain")
             message.attach(part1)
 
@@ -354,14 +352,15 @@ def sendingMail(payload):
                 server.login(sender_email, sender_password)
                 server.sendmail(sender_email, receiver_email, message.as_string())
 
-def editPayloadForEmail(payload, companies):
 
+def editPayloadForEmail(payload, companies):
     editedPayload = []
     for record in payload:
         if ("SELL" in str(record) and record[1] in str(companies)) or ("BUY" in str(record) and record[1] not in str(companies)):
             editedPayload.append(str(record[19]) + ' NOW ' + str(record[1]) + ' FOR PRICE ' + str(record[3]))
 
     return editedPayload
+
 
 if __name__ == '__main__':
     main()
