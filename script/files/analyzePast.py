@@ -182,7 +182,11 @@ def analyzePast(conditionBuyValue= 4, conditionSellValue=4, manual= True):
                 print(f'{i} {pair}')
                 print(f'{i} profit/loss {profit}')
             else:
-                print(f'{i} {pair[0][1]} B: {[pair[0][0],pair[0][2], pair[0][3]]} S: {[pair[1][0], pair[1][2], pair[1][3]]} Profit/Loss {profit}')
+                d1 = dt.datetime.strptime(formatDate(pair[0][0]), "%Y-%m-%d")
+                d2 = dt.datetime.strptime(formatDate(pair[1][0]), "%Y-%m-%d")
+                delta = d2 - d1
+
+                print(f'{i} {pair[0][1]} B: {[pair[0][0],pair[0][2], pair[0][3]]} S: {[pair[1][0], pair[1][2], pair[1][3]]} Profit/Loss: {profit} Days to Close: {delta.days}')
 
         print()
         print(f'LEFTOVER pair (OPEN)')
@@ -193,9 +197,18 @@ def analyzePast(conditionBuyValue= 4, conditionSellValue=4, manual= True):
                 print(f'{i} {pair}')
                 print(f'{i} profit/loss {profit}')
             else:
-                print(f'{i} {pair[0][1]} B: {[pair[0][0],pair[0][2], pair[0][3]]} S: {[pair[1][0], pair[1][2], pair[1][3]]} Profit/Loss {profit}')
+                d1 = dt.datetime.strptime(formatDate(pair[0][0]), "%Y-%m-%d")
+                d2 = dt.datetime.strptime(formatDate(pair[1][0]), "%Y-%m-%d")
+                delta = d2 - d1
+                print(f'{i} {pair[0][1]} B: {[pair[0][0], pair[0][2], pair[0][3]]} S: {[pair[1][0], pair[1][2], pair[1][3]]} Profit/Loss: {profit} Days on hold: {delta.days}')
 
     return [conditionBuyValue, conditionSellValue, efficiencyReturnValue, avarageProfitReturnValue, avarageChangeForValueForOpen, pairFound, pairWithLastKnownValue]
+
+def formatDate (date):
+
+    newDate = f'{date[0]}{date[1]}{date[2]}{date[3]}-{date[4]}{date[5]}-{date[6]}{date[7]}'
+
+    return newDate
 
 analyzePast(3,0)
 # findBestOptions()
