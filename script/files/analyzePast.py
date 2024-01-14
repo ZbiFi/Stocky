@@ -169,7 +169,7 @@ def analyzePast(conditionBuyValue= 4, conditionSellValue=4, manual= True):
         print('ConditionBuy: ' + str(conditionBuyValue))
         print('ConditionSell: ' + str(conditionSellValue))
         print('Efficiency: ' + str(efficiencyReturnValue) + '%')
-        print('Average profit: ' + str(avarageProfitReturnValue) + '%')
+        print('Average profit from pairs: ' + str(avarageProfitReturnValue) + '%')
         print('Average change of value for rest open: ' + str(avarageChangeForValueForOpen) + '%')
         print('Profit/Loss: ' + str(profilorLoss))
 
