@@ -59,7 +59,13 @@ last_oid = -1
 # print(mycursor.fetchall())
 
 def writeToFile(data, mode):
+
     prefix = ''
+
+    offset = int(config_dict['offset'])
+    if offset >= 10000:
+        prefix += str(offset)+'y_'
+
     if day_param > 1:
         prefix += str(day_param) + '_multi_'
     else:
