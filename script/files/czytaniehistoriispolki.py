@@ -64,7 +64,7 @@ def writeToFile(data, mode):
 
     offset = int(config_dict['offset'])
     if offset >= 10000:
-        prefix += str(offset)+'y_'
+        prefix += str(offset/10000)+'y_'
 
     if day_param > 1:
         prefix += str(day_param) + '_multi_'
