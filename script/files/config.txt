@@ -6,3 +6,5 @@ offset,0
 online_mode,0
 auto_mode,0
 send_email,0
+analyze_gpw,1
+analyze_newconnect,0

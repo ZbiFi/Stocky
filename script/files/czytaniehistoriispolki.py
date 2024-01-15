@@ -58,7 +58,7 @@ last_oid = -1
 # mycursor.execute(querry)
 # print(mycursor.fetchall())
 
-def writeToFile(data):
+def writeToFile(data, mode):
     prefix = ''
     if day_param > 1:
         prefix += str(day_param) + '_multi_'
@@ -66,6 +66,9 @@ def writeToFile(data):
         prefix += 'single_'
     if quartile_test:
         prefix += str(lower_quartile) + str(higher_quartile) + '_'
+
+    if mode == 2:
+        prefix += 'withNewConnect' + '_'
 
     dataString = str(datetime.date.today())
     # prefix = ''
@@ -79,9 +82,17 @@ def writeToFile(data):
             spamwriter.writerow(singleRow)
 
 
-def read_stock_raports():
+def read_stock_raports(analysisMode):
     # 0 - test 1 - GPW 2 - NewConnect
-    companies_list = ImportNamesFromFile.import_names_from_file(1)
+    text = ''
+    if analysisMode == 1:
+        text = 'GPW'
+    if analysisMode == 2:
+        text = 'NEW CONNECT'
+
+    print(f'{text} ANALYSIS')
+
+    companies_list = ImportNamesFromFile.import_names_from_file(analysisMode)
     time_table = []
     timeStart = datetime.datetime.now()
 
@@ -117,7 +128,7 @@ def read_stock_raports():
                     payload = reducedList
                     sendingMail(payload)
 
-            writeToFile(sortedOutputsArray)
+            writeToFile(sortedOutputsArray, analysisMode)
         time_end = time.time()
         time_passed = time_end - time_start
         print(f'Time {time_passed}')
@@ -284,6 +295,8 @@ def main():
     two_year_span = int(config_dict['two_year_span'])
     one_year_span = int(config_dict['one_year_span'])
     offset = int(config_dict['offset'])
+    gpw_analysis = int(config_dict['analyze_gpw'])
+    newconnect_analysis = int(config_dict['analyze_newconnect'])
     today_string = str(dt.datetime.now().date()).replace("-", "")
 
     analysisFrom = int(today_string) - one_year_span - offset
@@ -318,8 +331,10 @@ def main():
     #             lower_quartile = 0.15
     #             higher_quartile = 0.85
 
-    read_stock_raports()
-
+    if gpw_analysis:
+        read_stock_raports(1)
+    if newconnect_analysis:
+        read_stock_raports(2)
 
 def sendingMail(payload):
     port = 465  # For SSL
