@@ -1,7 +1,8 @@
 from numpy import mean
 
-from script.files import LoadArchiveDataFromFile
+from script.files import LoadArchiveDataFromFile, ConfigFile
 import datetime as dt
+
 
 def conditions(isBuy, conditionBuy, conditionSell, data):
 
@@ -93,6 +94,14 @@ def analyzePast(conditionBuyValue= 4, conditionSellValue=4, manual= True):
     sortedData = sorted(archiveData, key=lambda x: x[1])
     # print(sortedData)
 
+    today = dt.datetime.now().date()
+    todayStr = str(today)
+    todayStr2 = todayStr.replace("-", "")
+    config_dict = ConfigFile.load_config()
+    offset = int(config_dict['offset'])
+    todayWithOffset = int(todayStr2) - int(offset)
+    todayYearAgoWithOffset = int(todayStr2) - 10000 - int(offset)
+
     # SEGREGATE BY COMPANY NAMES AND SPLIT INTO SUBLISTS
     indexes = [index for index, _ in enumerate(sortedData) if sortedData[index][1] != sortedData[index - 1][1]]
     indexes.append(len(sortedData))
@@ -112,7 +121,8 @@ def analyzePast(conditionBuyValue= 4, conditionSellValue=4, manual= True):
         lastData = None
 
         for data in sortedByDate:
-            if conditions(True, conditionBuyValue, conditionSellValue, data[len(data)-1]) and not foundBuyFlag:
+            # if data[0] >= str(todayYearAgoWithOffset) and data[0] <= str(todayWithOffset) and conditions(True, conditionBuyValue, conditionSellValue, data[len(data)-1]) and not foundBuyFlag:
+            if conditions(True, conditionBuyValue, conditionSellValue, data[len(data) - 1]) and not foundBuyFlag:
                 foundBuyFlag = True
                 foundBuy = data
                 buySignal += 1

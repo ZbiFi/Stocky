@@ -60,6 +60,8 @@ last_oid = -1
 
 def writeToFile(data, mode):
 
+    # final = splitByCompanies(data)
+
     prefix = ''
 
     offset = int(config_dict['offset'])
@@ -87,6 +89,14 @@ def writeToFile(data, mode):
             row = [str(singleRow).replace('[', '').replace(']', '').replace(',', '|').replace('\'', '').replace('| ', '|').replace('.', ',')]
             spamwriter.writerow(singleRow)
 
+def splitByCompanies(data):
+
+    # SEGREGATE BY COMPANY NAMES AND SPLIT INTO SUBLISTS
+    indexes = [index for index, _ in enumerate(data) if data[index][1] != data[index - 1][1]]
+    indexes.append(len(data))
+    final = [data[indexes[i]:indexes[i + 1]] for i, _ in enumerate(indexes) if i != len(indexes) - 1]
+
+    return final
 
 def read_stock_raports(analysisMode):
     # 0 - test 1 - GPW 2 - NewConnect
