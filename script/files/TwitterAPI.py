@@ -64,6 +64,7 @@ def tweet(text):
 
     if len (text) <= 280:
         makeSimpleTweet('')
-
+    else:
+        print('Text is too long. MAX 280 CHARACTERS!')
 
 tweet('Test Tweet')
