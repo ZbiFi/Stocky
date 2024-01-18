@@ -1,3 +1,5 @@
+import datetime
+
 from requests_oauthlib import OAuth1Session
 import json
 import TwitterAuth
@@ -87,7 +89,7 @@ def reduceMessage(text):
                 message = '[' + str(counter) + '/' + '**' + ']' + '\n' + message
 
             counter += 1
-            message += '|' + '[' + str(counter) + '/' + '**' + ']' + '\n' + newMessage
+            message += '|' + '[' + str(counter) + '/' + '**' + ']' + '\n' + formatDate(str(text[0][0])) + ' GPW\n' + newMessage
 
         else:
             message += newMessage

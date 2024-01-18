@@ -142,11 +142,13 @@ def read_stock_raports(analysisMode):
                 for record in reducedList:
                     print(record)
                     # print(str(float(record[17])/float(record[15])))
-                if sendmail == 1:
-                    payload = reducedList
-                    sendingMail(payload)
-                if twitter_mode == 1:
-                    TwitterAPI.reduceMessage(reducedList)
+                weekdayInt = datetime.datetime.now().weekday()
+                if weekdayInt <= 4:
+                    if sendmail == 1:
+                        payload = reducedList
+                        sendingMail(payload)
+                    if twitter_mode == 1:
+                        TwitterAPI.reduceMessage(reducedList)
 
             writeToFile(sortedOutputsArray, analysisMode)
 
