@@ -19,7 +19,7 @@ import ConfigFile
 import SQLClass
 import buySellSignalAnalysis
 import SQLDICT
-from script.files import TwitterAPI
+import TwitterAPI
 
 today = dt.datetime.now().date()
 todayStr = str(today)
