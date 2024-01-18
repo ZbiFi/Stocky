@@ -19,6 +19,7 @@ import ConfigFile
 import SQLClass
 import buySellSignalAnalysis
 import SQLDICT
+from script.files import TwitterAPI
 
 today = dt.datetime.now().date()
 todayStr = str(today)
@@ -42,6 +43,7 @@ auto_mode = int(config_dict['auto_mode'])
 day_param = NumberOfDayMenu.days_choice(auto_mode)
 sendmail = int(config_dict['send_email'])
 online_mode = int(config_dict['online_mode'])
+twitter_mode = int(config_dict['publish_on_twitter'])
 
 if online_mode == 1:
     mydb, mycursor, database_param = DBCursos.main()
@@ -134,7 +136,7 @@ def read_stock_raports(analysisMode):
             payload = []
             reducedList = []
             for output in sortedOutputsArray:
-                if 'BUY3' in output or 'SELL' in str(output):
+                if 'BUY3' in output or output[len(output)-1] == 'SELL':
                     reducedList.append(output)
             if k <= 1:
                 for record in reducedList:
@@ -143,8 +145,11 @@ def read_stock_raports(analysisMode):
                 if sendmail == 1:
                     payload = reducedList
                     sendingMail(payload)
+                if twitter_mode == 1:
+                    TwitterAPI.reduceMessage(reducedList)
 
             writeToFile(sortedOutputsArray, analysisMode)
+
         time_end = time.time()
         time_passed = time_end - time_start
         print(f'Time {time_passed}')

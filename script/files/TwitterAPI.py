@@ -1,6 +1,6 @@
 from requests_oauthlib import OAuth1Session
 import json
-import  TwitterAuth
+import TwitterAuth
 
 
 consumer_key = TwitterAuth.consumer_key
@@ -62,9 +62,61 @@ def main(payload):
 
 def tweet(text):
 
-    if len (text) <= 280:
+    if len(text) <= 280:
         makeSimpleTweet('')
     else:
         print('Text is too long. MAX 280 CHARACTERS!')
 
-tweet('Test Tweet')
+        tweets = text.split('|')
+
+        for tweet in tweets:
+            makeSimpleTweet(tweet)
+            print(tweets)
+
+
+def reduceMessage(text):
+
+    message = ''
+    message += formatDate(str(text[0][0])) + ' GPW\n'
+    counter = 1
+
+    for record in text:
+        newMessage = str(record[1]) + ':' + str(record[3]) + ':' + translateDescriptions(record[len(record)-1]) + '\n'
+        if len(message) + len(newMessage) > 265 * counter:
+            if counter == 1:
+                message = '[' + str(counter) + '/' + '**' + ']' + '\n' + message
+
+            counter += 1
+            message += '|' + '[' + str(counter) + '/' + '**' + ']' + '\n' + newMessage
+
+        else:
+            message += newMessage
+    message = message.replace('**', str(counter))
+
+    tweet(message)
+
+
+def formatDate (date):
+
+    newDate = f'{date[0]}{date[1]}{date[2]}{date[3]}-{date[4]}{date[5]}-{date[6]}{date[7]}'
+
+    return newDate
+
+def translateDescriptions(text):
+
+    if text == 'BUY':
+        return ''
+    if text == 'BUY1':
+        return ''
+    if text == 'BUY2':
+        return 'B'
+    if text == 'BUY3':
+        return 'B'
+    if text == 'SELL':
+        return 'S'
+    if text == 'SELL1':
+        return ''
+    if text == 'SELL2':
+        return ''
+    if text == 'SELL3':
+        return ''

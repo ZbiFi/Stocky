@@ -8,3 +8,4 @@ auto_mode,0
 send_email,0
 analyze_gpw,1
 analyze_newconnect,0
+publish_on_twitter,1
