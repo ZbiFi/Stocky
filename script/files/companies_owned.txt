@@ -1,3 +1,2 @@
-kamos5@gazeta.pl, ECHO, CDPROJEKT ,ULTGAMES, CIGAMES,ASSECOPOL
+kamos5@gazeta.pl, ECHO, CDPROJEKT ,ULTGAMES, CIGAMES,ASSECOPOL, STALPROD
 stocky.mirandel@gazeta.pl, TEST
-a.wojnillo@gmail.com,
