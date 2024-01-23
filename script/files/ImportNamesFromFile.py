@@ -14,6 +14,10 @@ def import_names_from_file(import_type):
     # owned for emails
     if import_type == 2:
         filename = 'companies_newconnect.txt'
+    if import_type == 3:
+        filename = 'companies_uk100.txt'
+    if import_type == 4:
+        filename = 'companies_us100.txt'
 
     with open(filename, 'r') as f:
         reader = csv.reader(f)

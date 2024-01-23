@@ -5,7 +5,9 @@ one_year_span,10000
 offset,0
 online_mode,0
 auto_mode,0
-send_email,1
-analyze_gpw,1
+send_email,0
+analyze_gpw,0
 analyze_newconnect,0
+analyze_uk,0
+analyze_us,1
 publish_on_twitter,0

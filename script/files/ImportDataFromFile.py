@@ -4,7 +4,7 @@ import ConfigFile
 from os.path import exists
 
 
-def import_data_from_file(company_name):
+def import_data_from_file(company_name, mode):
 
     # print(company_name)
     config_dict = ConfigFile.load_config()
@@ -17,7 +17,14 @@ def import_data_from_file(company_name):
 
     today_string = str(dt.datetime.now().date()).replace("-", "")
 
-    filename = selenium_url + 'ALL/'+company_name+'.mst'  # BOS data
+    if mode == 3:
+        root = 'lse'
+    if mode == 4:
+        root = 'nasdaq'
+    else:
+        root = 'ALL'
+
+    filename = selenium_url + root + '/'+company_name+'.mst'  # BOS data
 
     if exists(filename):
         with open(filename, 'r') as f:

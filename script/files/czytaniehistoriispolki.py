@@ -77,8 +77,14 @@ def writeToFile(data, mode):
     if quartile_test:
         prefix += str(lower_quartile) + str(higher_quartile) + '_'
 
+    if mode == 1:
+        prefix += 'GPW' + '_'
     if mode == 2:
-        prefix += 'withNewConnect' + '_'
+        prefix += 'NewConnect' + '_'
+    if mode == 3:
+        prefix += 'LSE' + '_'
+    if mode == 4:
+        prefix += 'NASDAQ' + '_'
 
     dataString = str(datetime.date.today())
     # prefix = ''
@@ -107,6 +113,10 @@ def read_stock_raports(analysisMode):
         text = 'GPW'
     if analysisMode == 2:
         text = 'NEW CONNECT'
+    if analysisMode == 3:
+        text = 'LONDOD STOCK EXCHANGE (LSE)'
+    if analysisMode == 4:
+        text = 'NASDAQ'
 
     print(f'{text} ANALYSIS')
 
@@ -123,7 +133,7 @@ def read_stock_raports(analysisMode):
             lower_list.clear()
             upper_list.clear()
             date_list.clear()
-            company_data_from_two_years = ImportDataFromFile.import_data_from_file(str(company))
+            company_data_from_two_years = ImportDataFromFile.import_data_from_file(str(company), analysisMode)
             if k <= len(company_data_from_two_years):
                 analyze_data(company, k, company_data_from_two_years)
             time_comp_end = time.time()
@@ -320,6 +330,8 @@ def main():
     offset = int(config_dict['offset'])
     gpw_analysis = int(config_dict['analyze_gpw'])
     newconnect_analysis = int(config_dict['analyze_newconnect'])
+    uk_analysis = int(config_dict['analyze_uk'])
+    us_analysis = int(config_dict['analyze_us'])
     today_string = str(dt.datetime.now().date()).replace("-", "")
 
     analysisFrom = int(today_string) - one_year_span - offset
@@ -358,6 +370,10 @@ def main():
         read_stock_raports(1)
     if newconnect_analysis:
         read_stock_raports(2)
+    if uk_analysis:
+        read_stock_raports(3)
+    if us_analysis:
+        read_stock_raports(4)
 
 def sendingMail(payload):
     port = 465  # For SSL
