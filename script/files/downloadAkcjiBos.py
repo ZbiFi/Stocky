@@ -1,11 +1,14 @@
 import csv
 import datetime as dt
 import glob
+import time
 import urllib.request
 import os
 import zipfile
 import pandas as pd
 import yfinance as yf
+
+from script.files import ImportNamesFromFile
 
 seleniumfolder = 'C:/selenium/'
 
@@ -19,6 +22,7 @@ def start():
 def main():
     manage_download_all()  # bos
     # manage_download_lse()
+    # convert_temp_txt_yahoo_to_mst()
     # convert_txt_mst()
 
 def manage_download_all():
@@ -52,13 +56,49 @@ def manage_download_all():
 
 def manage_download_lse():
 
-    msft = yf.Ticker("MSFT")
+    companies_list = ImportNamesFromFile.import_names_from_file(4)
+    if not os.path.exists(seleniumfolder + '/temp'):
+        os.makedirs(seleniumfolder + '/temp')
 
-    # get historical market data
-    hist = msft.history(period="1y")
-    print(hist)
+    i = 0
+    print('Downloading NASDAQ companies')
+    for company in companies_list:
+        i += 1
+        print(f'Downloaded {i}/{len(companies_list)}')
+        msft = yf.Ticker(company)
 
-    hist.to_csv(seleniumfolder + 'temp.csv')
+        # get historical market data
+        hist = msft.history(period="1y")
+
+        if not os.path.exists(seleniumfolder + '/temp'):
+            os.makedirs(seleniumfolder + '/temp')
+        hist.to_csv(seleniumfolder + '/temp/' + company + '_temp.txt')
+
+
+def convert_temp_txt_yahoo_to_mst():
+
+    print('Converting txt to mst')
+
+    # us = 1
+    # if us == 1:
+    #
+    #     print('NASDAQ')
+    #     #US
+    #     tempPathString = seleniumfolder + '/temp'
+    #     targetPathString = seleniumfolder + "nasdaq"
+    #
+    #     if not os.path.exists(targetPathString):
+    #         os.makedirs(targetPathString)
+    #
+    #     for path in glob.glob(tempPathString + '/*.txt'):
+    #
+    #         f = pd.read_csv(path+"temp.csv")
+    #
+    #         keep_col = ['<TICKER>', '<DATE>', '<OPEN>','<HIGH>','<LOW>','<CLOSE>','<VOL>']
+    #         new_f = f[keep_col]
+    #         path = path.replace('.us.txt', '')
+    #         path = path.replace(seleniumfolder + stooqPathString, targetPathString)
+    #         new_f.to_csv(path + ".mst", index=False)
 
 def convert_txt_mst():
 
