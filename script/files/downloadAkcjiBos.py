@@ -9,10 +9,11 @@ import zipfile
 import pandas as pd
 import yfinance as yf
 
-from script.files import ImportNamesFromFile
+import ImportNamesFromFile
+import ConfigFile
 
-seleniumfolder = 'C:/selenium/'
-
+config_dict = ConfigFile.load_config()
+seleniumfolder = config_dict['selenium_url']
 
 def start():
     while True:
