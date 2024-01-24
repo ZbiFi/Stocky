@@ -14,6 +14,7 @@ access_token_secret = TwitterAuth.access_token_secret
 def makeSimpleTweet(text):
     payload = {"text": text}
     main(payload)
+
 def main(payload):
 
     # Get request token
@@ -51,6 +52,9 @@ def main(payload):
         json=payload,
     )
 
+    if response.status_code == 403:
+        print("You are not allowed to create a Tweet with duplicate content.")
+        return
     if response.status_code != 201:
         raise Exception(
             "Request returned an error: {} {}".format(response.status_code, response.text)
@@ -76,20 +80,20 @@ def tweet(text):
             print(tweets)
 
 
-def reduceMessage(text):
+def reduceMessage(text, textMode):
 
     message = ''
-    message += formatDate(str(text[0][0])) + ' GPW\n'
+    message += formatDate(str(text[0][0])) + ' ' + textMode + '\n'
     counter = 1
 
     for record in text:
-        newMessage = str(record[1]) + ':' + str(record[3]) + ':' + translateDescriptions(record[len(record)-1]) + '\n'
+        newMessage = str(record[1]) + ':' + str(round(record[3], 2)) + ':' + translateDescriptions(record[len(record)-1]) + '\n'
         if len(message) + len(newMessage) > 265 * counter:
             if counter == 1:
                 message = '[' + str(counter) + '/' + '**' + ']' + '\n' + message
 
             counter += 1
-            message += '|' + '[' + str(counter) + '/' + '**' + ']' + '\n' + formatDate(str(text[0][0])) + ' GPW\n' + newMessage
+            message += '|' + '[' + str(counter) + '/' + '**' + ']' + '\n' + formatDate(str(text[0][0])) + ' ' + textMode + '\n' + newMessage
 
         else:
             message += newMessage

@@ -1,6 +1,7 @@
 import csv
 import datetime as dt
 import glob
+import sys
 import time
 import urllib.request
 import os
@@ -21,9 +22,8 @@ def start():
 
 def main():
     manage_download_all()  # bos
-    # manage_download_lse()
-    # convert_temp_txt_yahoo_to_mst()
-    # convert_txt_mst()
+    manage_download_lse()
+    convert_temp_txt_yahoo_to_mst()
 
 def manage_download_all():
     filename = seleniumfolder + "ALL" + '.zip'
@@ -57,48 +57,86 @@ def manage_download_all():
 def manage_download_lse():
 
     companies_list = ImportNamesFromFile.import_names_from_file(4)
+
     if not os.path.exists(seleniumfolder + '/temp'):
         os.makedirs(seleniumfolder + '/temp')
 
     i = 0
     print('Downloading NASDAQ companies')
     for company in companies_list:
+
+        tempCompanyFile = seleniumfolder + '/temp/' + company + '_temp.csv'
         i += 1
-        print(f'Downloaded {i}/{len(companies_list)}')
+        progress_bar(i, len(companies_list))
+
+        today = dt.datetime.now().date()
+        if os.path.exists(tempCompanyFile):
+            filetime = dt.datetime.fromtimestamp(os.path.getmtime(tempCompanyFile))
+            if filetime.date() != today:
+                os.remove(tempCompanyFile)
+            if filetime.date() == today:
+                continue
+
         msft = yf.Ticker(company)
 
         # get historical market data
-        hist = msft.history(period="1y")
+        hist = msft.history(period="3y")
 
         if not os.path.exists(seleniumfolder + '/temp'):
             os.makedirs(seleniumfolder + '/temp')
-        hist.to_csv(seleniumfolder + '/temp/' + company + '_temp.txt')
 
+        hist.to_csv(tempCompanyFile)
+
+
+def progress_bar(current, total, bar_length=20):
+    fraction = current / total
+
+    arrow = int(fraction * bar_length - 1) * '-' + '>'
+    padding = int(bar_length - len(arrow)) * ' '
+
+    ending = '\n' if current == total else '\r'
+
+    print(f'Progress: [{arrow}{padding}] {int(fraction*100)}%', end=ending)
 
 def convert_temp_txt_yahoo_to_mst():
 
     print('Converting txt to mst')
 
-    # us = 1
-    # if us == 1:
-    #
-    #     print('NASDAQ')
-    #     #US
-    #     tempPathString = seleniumfolder + '/temp'
-    #     targetPathString = seleniumfolder + "nasdaq"
-    #
-    #     if not os.path.exists(targetPathString):
-    #         os.makedirs(targetPathString)
-    #
-    #     for path in glob.glob(tempPathString + '/*.txt'):
-    #
-    #         f = pd.read_csv(path+"temp.csv")
-    #
-    #         keep_col = ['<TICKER>', '<DATE>', '<OPEN>','<HIGH>','<LOW>','<CLOSE>','<VOL>']
-    #         new_f = f[keep_col]
-    #         path = path.replace('.us.txt', '')
-    #         path = path.replace(seleniumfolder + stooqPathString, targetPathString)
-    #         new_f.to_csv(path + ".mst", index=False)
+    us = 1
+    if us == 1:
+
+        print('NASDAQ')
+        #US
+        tempPathString = seleniumfolder + '/temp'
+        targetPathString = seleniumfolder + "nasdaq"
+
+        if not os.path.exists(targetPathString):
+            os.makedirs(targetPathString)
+
+        for path in glob.glob(tempPathString + '/*.csv'):
+
+            f = pd.read_csv(path)
+            path = path.replace('_temp.csv', '')
+            path = path.replace(tempPathString, targetPathString)
+
+            today = dt.datetime.now().date()
+            if os.path.exists(path + ".mst"):
+                filetime = dt.datetime.fromtimestamp(os.path.getmtime(path + ".mst"))
+                if filetime.date() != today:
+                    os.remove(path + ".mst")
+                if filetime.date() == today:
+                    continue
+
+            keep_col = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume']
+            new_f = f[keep_col]
+            new_f = new_f.add_prefix('<')
+            new_f = new_f.add_suffix('>')
+            new_f.columns = new_f.columns.str.upper()
+            new_f.columns = new_f.columns.str.replace('<DATE>', '<DTYYYYMMDD>')
+            new_f.columns = new_f.columns.str.replace('<VOLUME>', '<VOL>')
+            new_f.insert(0, '<TICKER>', os.path.basename(path))
+            new_f['<DTYYYYMMDD>'] = new_f['<DTYYYYMMDD>'].str.replace('-', '').str.split(' ').str[0]
+            new_f.to_csv(path + ".mst", index=False)
 
 def convert_txt_mst():
 

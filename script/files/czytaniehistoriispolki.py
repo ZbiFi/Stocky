@@ -124,6 +124,8 @@ def read_stock_raports(analysisMode):
     time_table = []
     timeStart = datetime.datetime.now()
 
+    outputsArray.clear()
+
     for k in range(day_param):
         print(str(k) + " from " + str(day_param))
         time_start = time.time()
@@ -154,11 +156,11 @@ def read_stock_raports(analysisMode):
                     # print(str(float(record[17])/float(record[15])))
                 weekdayInt = datetime.datetime.now().weekday()
                 if weekdayInt <= 4:
-                    if sendmail == 1:
+                    if sendmail == 1 and analysisMode == 1:
                         payload = reducedList
                         sendingMail(payload)
                     if twitter_mode == 1:
-                        TwitterAPI.reduceMessage(reducedList)
+                        TwitterAPI.reduceMessage(reducedList, text)
 
             writeToFile(sortedOutputsArray, analysisMode)
 
