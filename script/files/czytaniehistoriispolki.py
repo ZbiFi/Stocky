@@ -9,7 +9,7 @@ import datetime as dt
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-import pandas as pd
+import numpy as np
 import DBCursos
 import ImportNamesFromFile
 import ImportDataFromFile
@@ -229,9 +229,10 @@ def analyze_data(company_name, day_param_iterator, company_data_from_two_years):
             data_list.append(company_data_from_two_years[i][5])
 
         temp_max_value = 0
-        df = pd.DataFrame(data_list)
-        lower_list.append(df.quantile(lower_quartile).values.min())
-        upper_list.append(df.quantile(higher_quartile).values.min())
+
+        lower_list.append(np.quantile(data_list, lower_quartile))
+        upper_list.append(np.quantile(data_list, higher_quartile))
+
         date_list.append(int(company_data_from_two_years[j][1]))  # !!!!!!wrzucic do petli for i->powinno dzialac
         lets_say_current_list.append(data_list[0])
         for k in range(buffor_day_range):
@@ -239,10 +240,13 @@ def analyze_data(company_name, day_param_iterator, company_data_from_two_years):
                 temp_max_value = float(data_list[len(data_list) - 1 - k])
         max_value.append(temp_max_value)
         data_list.clear()
+
         time_j_end = time.time()
+
         # print(f'TimeJ: ' + str(j) + ' ' + str(time_j_end-time_j_start))
         timeJ.append(time_j_end - time_j_start)
 
+    # print(f' Sum of small {sum(timeJ)}')
     if len(lets_say_current_list) > 0:
         highest = max(lets_say_current_list)
         lowest = min(lets_say_current_list)
