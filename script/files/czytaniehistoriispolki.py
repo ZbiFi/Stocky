@@ -24,10 +24,7 @@ today = dt.datetime.now().date()
 todayStr = str(today)
 todayStr2 = todayStr.replace("-", "")
 
-lower_list = []
-upper_list = []
 outputsArray = []
-date_list = []
 curr_2year = []
 lower_quartile = 0.33
 higher_quartile = 0.66
@@ -107,6 +104,12 @@ def splitByCompanies(data):
 
     return final
 
+def multithreadTest(company, analysisMode, k):
+
+    company_data_from_two_years = ImportDataFromFile.import_data_from_file(str(company), analysisMode)
+    if k <= len(company_data_from_two_years):
+        analyze_data(company, k, company_data_from_two_years)
+
 def read_stock_raports(analysisMode):
     # 0 - test 1 - GPW 2 - NewConnect
     text = ''
@@ -132,16 +135,16 @@ def read_stock_raports(analysisMode):
     for k in range(day_param):
         print(str(k) + " from " + str(day_param))
         time_start = time.time()
+
         for company in companies_list:
 
-            time_comp_start = time.time()
-            lower_list.clear()
-            upper_list.clear()
-            date_list.clear()
+            # time_comp_start = time.time()
             company_data_from_two_years = ImportDataFromFile.import_data_from_file(str(company), analysisMode)
+
             if k <= len(company_data_from_two_years):
                 analyze_data(company, k, company_data_from_two_years)
-            time_comp_end = time.time()
+
+            # time_comp_end = time.time()
             # print(time_comp_end - time_comp_start)
 
         print(str(round(100 * ((k + 1) / day_param), 3)) + '% Complete')
@@ -183,13 +186,14 @@ def read_stock_raports(analysisMode):
 
 def analyze_data(company_name, day_param_iterator, company_data_from_two_years):
     time_lapse = 10000
-    global max_value
     days_in_year = 0
     current_status = ""
     last_status = ""
     previous_status = ""
+    lower_list = []
+    upper_list = []
+    date_list = []
     max_value = []
-    max_value.clear()
     statuses = []
     output = []
     buffor_day_range = 5  # zakres bufforu z pocatku roku uniemozliwiajacy sell
@@ -200,7 +204,6 @@ def analyze_data(company_name, day_param_iterator, company_data_from_two_years):
     special_text = ""
     special_value = 0
     temp_value_for_i = 0
-    max_value.clear()
     progression = 0
 
     data_list = []
@@ -237,7 +240,7 @@ def analyze_data(company_name, day_param_iterator, company_data_from_two_years):
         max_value.append(temp_max_value)
         data_list.clear()
         time_j_end = time.time()
-        # print(f'TimeJ: ' + str(time_j_end-time_j_start))
+        # print(f'TimeJ: ' + str(j) + ' ' + str(time_j_end-time_j_start))
         timeJ.append(time_j_end - time_j_start)
 
     if len(lets_say_current_list) > 0:
@@ -330,7 +333,7 @@ def analyze_data(company_name, day_param_iterator, company_data_from_two_years):
 
 
 def main():
-    global last_oid, last_id, max_value
+    global last_oid, last_id
     if online_mode == 1:
         last_oid, last_id = sqlClass.select_last_from_mysql_db("raport")
 
@@ -349,7 +352,6 @@ def main():
 
     print(f'Analysis from {analysisFrom} to {analysisTo}')
 
-    max_value = []
     # global lower_quartile
     # global higher_quartile
     # for i in range(7):
