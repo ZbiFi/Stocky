@@ -68,10 +68,11 @@ def main(payload):
 
 def tweet(text):
 
-    if len(text) <= 280:
-        makeSimpleTweet('')
+    if len(text) + text.count('\n') < 280:
+        makeSimpleTweet(text)
+        print(text)
     else:
-        print('Text is too long. MAX 280 CHARACTERS!')
+        print('Text is too long. Split into smaller tweets MAX 280 CHARACTERS!')
 
         tweets = text.split('|')
 
@@ -88,7 +89,7 @@ def reduceMessage(text, textMode):
 
     for record in text:
         newMessage = str(record[1]) + ':' + str(round(record[3], 2)) + ':' + translateDescriptions(record[len(record)-1]) + '\n'
-        if len(message) + len(newMessage) > 265 * counter:
+        if len(message) + message.count('\n') + len(newMessage) + newMessage.count('\n') + 9 >= (255 + message.count('|')) * counter:
             if counter == 1:
                 message = '[' + str(counter) + '/' + '**' + ']' + '\n' + message
 

@@ -18,7 +18,6 @@ import DaysInYear
 import ConfigFile
 import SQLClass
 import buySellSignalAnalysis
-import SQLDICT
 import TwitterAPI
 
 today = dt.datetime.now().date()
@@ -68,7 +67,7 @@ def writeToFile(data, mode):
 
     offset = int(config_dict['offset'])
     if offset >= 10000:
-        prefix += str(offset/10000)+'y_'
+        prefix += str(int(offset/10000))+'y_'
 
     if day_param > 1:
         prefix += str(day_param) + '_multi_'
@@ -85,6 +84,8 @@ def writeToFile(data, mode):
         prefix += 'LSE' + '_'
     if mode == 4:
         prefix += 'NASDAQ' + '_'
+    if mode == 5:
+        prefix += 'DAX' + '_'
 
     dataString = str(datetime.date.today())
     # prefix = ''
@@ -117,6 +118,8 @@ def read_stock_raports(analysisMode):
         text = 'LONDOD STOCK EXCHANGE (LSE)'
     if analysisMode == 4:
         text = 'NASDAQ'
+    if analysisMode == 5:
+        text = 'DAX'
 
     print(f'{text} ANALYSIS')
 
@@ -160,6 +163,10 @@ def read_stock_raports(analysisMode):
                         payload = reducedList
                         sendingMail(payload)
                     if twitter_mode == 1:
+                        #de
+                        if analysisMode == 5:
+                           for record in reducedList:
+                                record[1] = record[1].replace('.DE', '')
                         TwitterAPI.reduceMessage(reducedList, text)
 
             writeToFile(sortedOutputsArray, analysisMode)
@@ -334,6 +341,7 @@ def main():
     newconnect_analysis = int(config_dict['analyze_newconnect'])
     uk_analysis = int(config_dict['analyze_uk'])
     us_analysis = int(config_dict['analyze_us'])
+    de_analysis = int(config_dict['analyze_de'])
     today_string = str(dt.datetime.now().date()).replace("-", "")
 
     analysisFrom = int(today_string) - one_year_span - offset
@@ -376,6 +384,8 @@ def main():
         read_stock_raports(3)
     if us_analysis:
         read_stock_raports(4)
+    if de_analysis:
+        read_stock_raports(5)
 
 def sendingMail(payload):
     port = 465  # For SSL

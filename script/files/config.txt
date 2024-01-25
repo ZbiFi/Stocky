@@ -9,5 +9,6 @@ send_email,0
 analyze_gpw,1
 analyze_newconnect,0
 analyze_uk,0
+analyze_de,1
 analyze_us,1
 publish_on_twitter,1

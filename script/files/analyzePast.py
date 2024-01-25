@@ -220,5 +220,5 @@ def formatDate (date):
 
     return newDate
 
-analyzePast(3,0)
-# findBestOptions()
+# analyzePast(3,0)
+findBestOptions()

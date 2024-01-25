@@ -19,8 +19,10 @@ def import_data_from_file(company_name, mode):
 
     if mode == 3:
         root = 'lse'
-    if mode == 4:
+    elif mode == 4:
         root = 'nasdaq'
+    elif mode == 5:
+        root = 'dax'
     else:
         root = 'ALL'
 
@@ -33,6 +35,8 @@ def import_data_from_file(company_name, mode):
             f.readline()
 
             for row in reversed(list(reader)):
+                if row[2] == '' or row[3] == '' or row[4] == '' or row[5] == '':
+                    continue
                 if (int(row[1]) >= int(today_string) - two_year_span - offset) and int(row[1]) <= (int(today_string) - offset):
                     super_data.append(row)
                     i += 1

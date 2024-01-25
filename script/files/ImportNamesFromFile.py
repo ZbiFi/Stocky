@@ -18,6 +18,8 @@ def import_names_from_file(import_type):
         filename = 'companies_uk100.txt'
     if import_type == 4:
         filename = 'companies_us100.txt'
+    if import_type == 5:
+        filename = 'companies_de40.txt'
 
     with open(filename, 'r') as f:
         reader = csv.reader(f)
