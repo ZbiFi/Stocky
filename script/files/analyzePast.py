@@ -1,6 +1,6 @@
 from numpy import mean
 
-from script.files import LoadArchiveDataFromFile, ConfigFile
+import LoadArchiveDataFromFile, ConfigFile
 import datetime as dt
 
 
