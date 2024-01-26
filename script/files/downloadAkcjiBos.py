@@ -20,6 +20,8 @@ def start():
 
 def main():
     manage_download_all()  # bos
+    manage_download_yahoo(3)  # nasdaq
+    convert_temp_txt_yahoo_to_mst(3)
     manage_download_yahoo(4)  # nasdaq
     convert_temp_txt_yahoo_to_mst(4)
     manage_download_yahoo(5)  # dax
@@ -59,6 +61,11 @@ def manage_download_yahoo(mode):
     companies_list = ImportNamesFromFile.import_names_from_file(mode)
 
     tempFolder = 'temp'
+    sufix = ''
+    if mode == 3:
+        tempFolder = 'lse_temp'
+        sufix += '.L'
+        print('Downloading LSE companies')
     if mode == 4:
         tempFolder = 'nasdaq_temp'
         print('Downloading NASDAQ companies')
@@ -85,7 +92,7 @@ def manage_download_yahoo(mode):
             if filetime.date() == today:
                 continue
 
-        msft = yf.Ticker(company)
+        msft = yf.Ticker(company+sufix)
 
         # get historical market data
         hist = msft.history(period="5y")
@@ -110,6 +117,12 @@ def convert_temp_txt_yahoo_to_mst(mode):
     print('Converting txt to mst')
     tempPathString = seleniumfolder + 'temp'
     targetPathString = seleniumfolder + 'temp2'
+
+    if mode == 3:
+        # US
+        print('LSE')
+        tempPathString = seleniumfolder + 'lse_temp'
+        targetPathString = seleniumfolder + "lse"
 
     if mode == 4:
         # US
