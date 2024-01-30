@@ -118,7 +118,7 @@ def read_stock_raports(analysisMode):
     if analysisMode == 2:
         text = 'NEW CONNECT'
     if analysisMode == 3:
-        text = 'LONDOD STOCK EXCHANGE (LSE)'
+        text = 'LONDON STOCK EXCHANGE (LSE)'
     if analysisMode == 4:
         text = 'NASDAQ'
     if analysisMode == 5:
