@@ -322,7 +322,8 @@ def analyze_data(company_name, day_param_iterator, company_data_from_two_years):
         # checking for max range of dates in comp history ex if company is 30 days on market,but users checks for 45days
         if int(day_param_iterator) < len(lower_list):
 
-            output = [date_list[temp_value_for_i], company_name, "Current Value:", lets_say_current_list[temp_value_for_i], "Current status", current_status, "Previous status", previous_status, "Streak", progression, low_max_text, low_max_value, special_text, special_value, "Lower Price Channel", lower_list[temp_value_for_i], "Upper Price Channel", upper_list[temp_value_for_i], max_value[day_param_iterator]]
+            output = [date_list[temp_value_for_i], company_name, "Current Value:", formatValue(lets_say_current_list[temp_value_for_i]), "Current status", current_status, "Previous status", previous_status, "Streak", progression, low_max_text, formatValue(low_max_value), special_text, formatValue(special_value), "Lower Price Channel", formatValue(lower_list[temp_value_for_i]), "Upper Price Channel", formatValue(upper_list[temp_value_for_i]), formatValue(max_value[day_param_iterator])]
+            # output = [date_list[temp_value_for_i], company_name, "Current Value:", lets_say_current_list[temp_value_for_i], "Current status", current_status, "Previous status", previous_status, "Streak", progression, low_max_text, low_max_value, special_text, special_value, "Lower Price Channel", lower_list[temp_value_for_i], "Upper Price Channel", upper_list[temp_value_for_i], max_value[day_param_iterator]]
             # analyze_price_channel(output)
             if online_mode == 1:
                 if sqlClass.check_if_record_already_exist(output):
@@ -335,6 +336,8 @@ def analyze_data(company_name, day_param_iterator, company_data_from_two_years):
                 buySellSignalAnalysis.analyze_price_channel(output)
                 outputsArray.append(output)
 
+def formatValue(value):
+    return "{0:.2f}".format(float(value))
 
 def main():
     global last_oid, last_id

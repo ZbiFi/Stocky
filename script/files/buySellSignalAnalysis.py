@@ -4,23 +4,16 @@ def analyze_price_channel(output):
     # [5] status        [11] prct special value (min/max etc)
     if output[5] == "low":
         if float(output[3]) / float(output[11]) > float(1.10):
-            # Cena ponad 10% od dołka(pod kanalem cenonwym)
-            # print("Start of rising - BUY")
-            # text = "Start of slowly rising - BUY"
+            # Cena ponad 10% od dołka (pod kanalem cenonwym)
             text = "BUY"
-        # elif ((float(output[3])/float(output[11])>float(1.10)):
-        # text = "Heavy spike up - risky BUY"
-        # print("aaaaaaaaaaaa")
 
         else:
             if int(output[9] > int(10)):
                 # Cena jest blisko dołka przez ponad 10 dni (pod kanalem cenonwym)
-                # print("Lies deep beneath the ocean - time to buy")
-                # text ="Lies deep beneath the ocean - time to buy"
+
                 text = "BUY1"
             else:
                 # Cena spadla pod kanal cenonwy
-                # print("Starts being cheap - think about buying")
                 # if spread in channel price > 10%
                 if float(output[17]) / float(output[15]) >= 1.10:
                     text = "BUY3"
@@ -55,16 +48,13 @@ def analyze_price_channel(output):
     if (output[5] == "upper") and (float(output[3]) > float(output[18])):
         if float(output[3]) / float(output[11]) > float(0.9):
             # Cena buduje szczyt - jestes w topie lub w 10% odleglosci od niego
-            # print("Making summit - SELL!")
             text = "SELL"
         else:
             if int(output[9] > int(10)):
                 # cena zrobila szczyt i utrzymuje wartosc wieksza niz 10% od szczytu ale wciaz jest droga
-                # print("Goind down - time to sell")
                 text = "SELL1"
             else:
                 # cena spadla o wiecej niz 10% od szczytu w ostatnich dniach( <10 ergo. szybko),ale wciaz jest droga
-                # print("Expensive but far from heaven - think of selling")
                 # if spread in channel price > 10%
                 if float(output[17]) / float(output[15]) >= 1.10:
                     text = "SELL3"
