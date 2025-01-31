@@ -19,13 +19,16 @@ def start():
 
 
 def main():
-    manage_download_all()  # bos
+    # manage_download_all()  # bos
+    manage_download_yahoo(1)
+    convert_temp_txt_yahoo_to_mst(1)
     manage_download_yahoo(3)  # nasdaq
     convert_temp_txt_yahoo_to_mst(3)
     manage_download_yahoo(4)  # nasdaq
     convert_temp_txt_yahoo_to_mst(4)
     manage_download_yahoo(5)  # dax
     convert_temp_txt_yahoo_to_mst(5)
+
 
 def manage_download_all():
     filename = seleniumfolder + "ALL" + '.zip'
@@ -46,7 +49,8 @@ def manage_download_all():
     if not os.path.exists(seleniumfolder):
         os.makedirs(seleniumfolder)
         os.makedirs(seleniumfolder + "ALL")
-    urllib.request.urlretrieve('http://bossa.pl/pub/metastock/mstock/mstall.zip', fullfilename)
+    # urllib.request.urlretrieve('http://bossa.pl/pub/metastock/mstock/mstall.zip', fullfilename)
+    urllib.request.urlretrieve('https://stooq.pl/db/d/?b=d_pl_txt', fullfilename)
     print("downloaded ALL")
 
     # urllib.request.urlretrieve('https://stooq.pl/q/d/l/?s=trypln&i=d', fullfilename_2)
@@ -62,6 +66,10 @@ def manage_download_yahoo(mode):
 
     tempFolder = 'temp'
     sufix = ''
+    if mode == 1:
+        tempFolder = 'gpw_temp'
+        sufix += '.WA'
+        print('Downloading GPW')
     if mode == 3:
         tempFolder = 'lse_temp'
         sufix += '.L'
@@ -117,6 +125,12 @@ def convert_temp_txt_yahoo_to_mst(mode):
     print('Converting txt to mst')
     tempPathString = seleniumfolder + 'temp'
     targetPathString = seleniumfolder + 'temp2'
+
+    if mode == 1:
+        # US
+        print('GWP')
+        tempPathString = seleniumfolder + 'gpw_temp'
+        targetPathString = seleniumfolder + "all"
 
     if mode == 3:
         # US
