@@ -139,7 +139,7 @@ def read_stock_raports(analysisMode):
         for company in companies_list:
 
             # time_comp_start = time.time()
-            company_data_from_two_years = ImportDataFromFile.import_data_from_file(str(company), analysisMode)
+            company_data_from_two_years = ImportDataFromFile.import_data_from_file(str(company), analysisMode, day_param)
 
             if k <= len(company_data_from_two_years):
                 analyze_data(company, k, company_data_from_two_years)
@@ -154,7 +154,7 @@ def read_stock_raports(analysisMode):
             payload = []
             reducedList = []
             for output in sortedOutputsArray:
-                if 'BUY3' in output or output[len(output)-1] == 'SELL':
+                # if 'BUY3' in output or output[len(output)-1] == 'SELL':
                     reducedList.append(output)
             if k <= 1:
                 for record in reducedList:

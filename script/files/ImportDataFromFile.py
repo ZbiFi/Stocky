@@ -4,7 +4,7 @@ import ConfigFile
 from os.path import exists
 
 
-def import_data_from_file(company_name, mode):
+def import_data_from_file(company_name, mode, day_param):
 
     # print(company_name)
     config_dict = ConfigFile.load_config()
@@ -37,10 +37,10 @@ def import_data_from_file(company_name, mode):
             for row in reversed(list(reader)):
                 if row[2] == '' or row[3] == '' or row[4] == '' or row[5] == '':
                     continue
-                if (int(row[1]) >= int(today_string) - two_year_span - offset) and int(row[1]) <= (int(today_string) - offset):
+                if (int(row[1]) >= int(today_string) - two_year_span - offset - day_param) and int(row[1]) <= (int(today_string) - offset - day_param):
                     super_data.append(row)
                     i += 1
-                if (int(row[1]) < int(today_string) - two_year_span - offset):
+                if (int(row[1]) < int(today_string) - two_year_span - offset - day_param):
                     break
                 else:
                     continue
