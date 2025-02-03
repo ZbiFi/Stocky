@@ -154,7 +154,7 @@ def read_stock_raports(analysisMode):
             payload = []
             reducedList = []
             for output in sortedOutputsArray:
-                # if 'BUY3' in output or output[len(output)-1] == 'SELL':
+                if 'BUY3' in output or output[len(output)-1] == 'SELL':
                     reducedList.append(output)
             if k <= 1:
                 for record in reducedList:
