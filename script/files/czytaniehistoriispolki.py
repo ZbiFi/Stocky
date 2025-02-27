@@ -162,9 +162,9 @@ def read_stock_raports(analysisMode):
                     # print(str(float(record[17])/float(record[15])))
                 weekdayInt = datetime.datetime.now().weekday()
                 if weekdayInt <= 4:
-                    if sendmail == 1 and analysisMode == 1:
+                    if sendmail == 1:
                         payload = reducedList
-                        sendingMail(payload)
+                        sendingMail(payload, text)
                     if twitter_mode == 1:
                         #de
                         if analysisMode == 5:
@@ -396,7 +396,7 @@ def main():
     if de_analysis:
         read_stock_raports(5)
 
-def sendingMail(payload):
+def sendingMail(payload, text):
     port = 465  # For SSL
     smtp_server = "smtp.gazeta.pl"
 
@@ -412,7 +412,7 @@ def sendingMail(payload):
         messageStr = ""
 
         message = MIMEMultipart("alternative")
-        message["Subject"] = "IMPORTANT STOCK UPDATE " + str(datetime.date.today())
+        message["Subject"] = "IMPORTANT STOCK UPDATE " + str(text) + " " + str(datetime.date.today())
         message["From"] = sender_email
         message["To"] = receiver_email
         editedPayload = editPayloadForEmail(payload, mailWithCompany[1:])
